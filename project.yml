@@ -1,0 +1,70 @@
+name: Hikma
+options:
+  bundleIdPrefix: com.hikma
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: ar
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Hikma:
+    type: application
+    platform: iOS
+    sources:
+      - path: Hikma
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.hikma.app
+        PRODUCT_NAME: Hikma
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: YES
+    info:
+      path: Hikma/Info.plist
+      properties:
+        CFBundleDisplayName: حكمة
+        CFBundleDevelopmentRegion: ar
+        CFBundleLocalizations:
+          - ar
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        # Lets iOS wake the app now and then to top up the notification queue.
+        UIBackgroundModes:
+          - fetch
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.hikma.app.refresh
+        ITSAppUsesNonExemptEncryption: false
+  HikmaTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: HikmaTests
+    dependencies:
+      - target: Hikma
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  Hikma:
+    build:
+      targets:
+        Hikma: all
+        HikmaTests: [test]
+    test:
+      targets:
+        - HikmaTests

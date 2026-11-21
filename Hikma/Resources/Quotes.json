@@ -1,0 +1,802 @@
+[
+ {
+  "id": "laozi-64",
+  "culture": "الصين",
+  "sayer": "لاو تسو",
+  "source": "«كتاب الطريق والفضيلة» (تاو تي تشينغ)، الفصل ٦٤",
+  "text": "رحلةُ الألفِ ميلٍ تبدأ بخطوةٍ واحدة.",
+  "original": "千里之行，始於足下"
+ },
+ {
+  "id": "laozi-33",
+  "culture": "الصين",
+  "sayer": "لاو تسو",
+  "source": "«كتاب الطريق والفضيلة» (تاو تي تشينغ)، الفصل ٣٣",
+  "text": "مَن يعرف الناسَ حكيم، ومَن يعرف نفسَه مستنير؛ مَن يغلب غيرَه قويّ، ومَن يغلب نفسَه أقوى.",
+  "original": "知人者智，自知者明。勝人者有力，自勝者強"
+ },
+ {
+  "id": "confucius-mound",
+  "culture": "الصين",
+  "sayer": "كونفوشيوس",
+  "source": "«المختارات» (الأناليكتس)، ٩:١٩",
+  "text": "مَثَلي كمَن يبني تلًّا من التراب؛ إن توقّفتُ قبل السلّة الأخيرة، فأنا الذي توقّفت.",
+  "original": "譬如為山，未成一簣，止，吾止也"
+ },
+ {
+  "id": "confucius-position",
+  "culture": "الصين",
+  "sayer": "كونفوشيوس",
+  "source": "«المختارات» (الأناليكتس)، ٤:١٤",
+  "text": "لا يُقلقك أنك بلا منصب، بل ليُقلقك أن تكون أهلًا له.",
+  "original": "不患無位，患所以立"
+ },
+ {
+  "id": "confucius-know",
+  "culture": "الصين",
+  "sayer": "كونفوشيوس",
+  "source": "«المختارات» (الأناليكتس)، ٢:١٧",
+  "text": "أن تقول عمّا تعرفه: أعرفه، وعمّا لا تعرفه: لا أعرفه؛ تلك هي المعرفة.",
+  "original": "知之為知之，不知為不知，是知也"
+ },
+ {
+  "id": "confucius-three",
+  "culture": "الصين",
+  "sayer": "كونفوشيوس",
+  "source": "«المختارات» (الأناليكتس)، ٧:٢٢",
+  "text": "إذا سار ثلاثةٌ معًا، فلا بدّ أن بينهم معلّمًا لي.",
+  "original": "三人行，必有我師焉"
+ },
+ {
+  "id": "mencius-6b15",
+  "culture": "الصين",
+  "sayer": "منشيوس",
+  "source": "كتاب «منشيوس»، ٦ب:١٥",
+  "text": "إذا أرادت السماءُ أن تُلقي على امرئٍ مهمةً عظيمة، امتحنت قلبَه بالشدّة أولًا.",
+  "original": "天將降大任於斯人也，必先苦其心志"
+ },
+ {
+  "id": "xunzi-learning",
+  "culture": "الصين",
+  "sayer": "شيون زي",
+  "source": "باب «الحثّ على التعلّم» من كتاب «شيون زي»",
+  "text": "مَن واصل النقشَ ولم يتوقّف، نقش في الحديد والحجر.",
+  "original": "鍥而不舍，金石可鏤"
+ },
+ {
+  "id": "liezi-yugong",
+  "culture": "الصين",
+  "sayer": "حكاية «العجوز الذي نقل الجبل»",
+  "source": "كتاب «ليه تسي»",
+  "text": "يأتي بعدي أبنائي وأحفادي جيلًا بعد جيل، والجبلُ لا يزداد علوًّا؛ فلماذا لا نزيحه؟",
+  "original": "子子孫孫無窮匱也，而山不加增，何苦而不平"
+ },
+ {
+  "id": "sunzi-3",
+  "culture": "الصين",
+  "sayer": "سون تزو",
+  "source": "«فن الحرب»، الفصل الثالث",
+  "text": "اعرف خصمَك واعرف نفسَك، تخُضْ مئةَ معركةٍ دون أن تُهزَم.",
+  "original": "知彼知己，百戰不殆"
+ },
+ {
+  "id": "luxun-road",
+  "culture": "الصين",
+  "sayer": "لو شون",
+  "source": "قصة «الموطن القديم»، ١٩٢١",
+  "text": "الأملُ كالطريق في البرّية؛ لم يكن موجودًا في الأصل، لكن حين يكثر السائرون فيه يصير طريقًا.",
+  "original": "其實地上本沒有路，走的人多了，也便成了路"
+ },
+ {
+  "id": "jp-nanakorobi",
+  "culture": "اليابان",
+  "sayer": "مثل ياباني",
+  "source": "الأمثال الشعبية اليابانية",
+  "text": "اسقطْ سبعَ مرات، وانهضْ ثمانيًا.",
+  "original": "七転び八起き"
+ },
+ {
+  "id": "jp-ishi",
+  "culture": "اليابان",
+  "sayer": "مثل ياباني",
+  "source": "الأمثال الشعبية اليابانية",
+  "text": "اجلسْ على الحجر البارد ثلاثَ سنين، وسيدفأ تحتك.",
+  "original": "石の上にも三年"
+ },
+ {
+  "id": "musashi-water",
+  "culture": "اليابان",
+  "sayer": "مياموتو موساشي",
+  "source": "«كتاب الحلقات الخمس» — كتاب الماء",
+  "text": "انتصارُك اليوم هو انتصارُك على نفسك التي كنتَها بالأمس.",
+  "original": "今日は昨日の我に勝ち"
+ },
+ {
+  "id": "kr-start",
+  "culture": "كوريا",
+  "sayer": "مثل كوري",
+  "source": "الأمثال الشعبية الكورية",
+  "text": "البدايةُ نصفُ الطريق.",
+  "original": "시작이 반이다"
+ },
+ {
+  "id": "kr-sky",
+  "culture": "كوريا",
+  "sayer": "مثل كوري",
+  "source": "الأمثال الشعبية الكورية",
+  "text": "حتى لو انهارت السماء، فهناك ثُقبٌ للنجاة.",
+  "original": "하늘이 무너져도 솟아날 구멍이 있다"
+ },
+ {
+  "id": "vn-needle",
+  "culture": "فيتنام",
+  "sayer": "مثل فيتنامي",
+  "source": "الأمثال الشعبية الفيتنامية",
+  "text": "مَن صبر على صقل قضيب الحديد، صنع منه يومًا إبرة.",
+  "original": "Có công mài sắt, có ngày nên kim"
+ },
+ {
+  "id": "gita-2-47",
+  "culture": "الهند",
+  "sayer": "كريشنا",
+  "source": "«بهاغافاد غيتا»، ٢:٤٧",
+  "text": "لك أن تعمل، وليس لك أن تتعلّق بثمار عملك.",
+  "original": "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन"
+ },
+ {
+  "id": "dhammapada-103",
+  "culture": "الهند",
+  "sayer": "بوذا",
+  "source": "«دَمّابادا»، البيت ١٠٣",
+  "text": "مَن يهزم ألفَ ألفِ رجلٍ في المعركة، ليس كمن يهزم نفسَه؛ فذاك أعظمُ المنتصرين.",
+  "original": null
+ },
+ {
+  "id": "dhammapada-122",
+  "culture": "الهند",
+  "sayer": "بوذا",
+  "source": "«دَمّابادا»، البيت ١٢٢",
+  "text": "لا تستهِنْ بالخير قائلًا: لن يصيبني؛ فبالقطرة تلو القطرة تمتلئ الجرّة.",
+  "original": null
+ },
+ {
+  "id": "gandhi-will",
+  "culture": "الهند",
+  "sayer": "المهاتما غاندي",
+  "source": "مقال «عقيدة السيف»، صحيفة «يونغ إنديا»، ١٩٢٠",
+  "text": "القوّةُ لا تأتي من القدرة البدنية، بل من إرادةٍ لا تُقهَر.",
+  "original": "Strength does not come from physical capacity. It comes from an indomitable will."
+ },
+ {
+  "id": "vivekananda-arise",
+  "culture": "الهند",
+  "sayer": "سوامي فيفيكاناندا",
+  "source": "من محاضراته، مستلهَمًا من «كاثا أوبانيشاد»",
+  "text": "انهضْ، واستيقظْ، ولا تتوقّفْ حتى تبلغَ الهدف.",
+  "original": "Arise, awake, and stop not till the goal is reached."
+ },
+ {
+  "id": "kural-616",
+  "culture": "الهند (التاميل)",
+  "sayer": "ثيروفالّوفار",
+  "source": "«ثيروكورال»، البيت ٦١٦",
+  "text": "الجُهدُ يجلب الرخاء، والكسلُ يجلب الفقر.",
+  "original": null
+ },
+ {
+  "id": "tagore-35",
+  "culture": "الهند (البنغال)",
+  "sayer": "رابندرانات طاغور",
+  "source": "ديوان «جيتانجالي»، القصيدة ٣٥، ١٩١٢",
+  "text": "حيث العقلُ بلا خوف، والرأسُ مرفوعٌ عاليًا.",
+  "original": "Where the mind is without fear and the head is held high"
+ },
+ {
+  "id": "ptahhotep-art",
+  "culture": "مصر القديمة",
+  "sayer": "بتاح حتب",
+  "source": "«تعاليم بتاح حتب»",
+  "text": "لا حدَّ يُبلَغ في الإتقان، وما من صانعٍ بلغت مهارتُه الكمال.",
+  "original": null
+ },
+ {
+  "id": "mutanabbi-stars",
+  "culture": "العالم العربي",
+  "sayer": "المتنبّي",
+  "source": "ديوان المتنبّي",
+  "text": "إذا غامرتَ في شرفٍ مَرومِ ... فلا تقنعْ بما دون النجومِ",
+  "original": null
+ },
+ {
+  "id": "mutanabbi-azm",
+  "culture": "العالم العربي",
+  "sayer": "المتنبّي",
+  "source": "ديوان المتنبّي",
+  "text": "على قدرِ أهلِ العزمِ تأتي العزائمُ ... وتأتي على قدرِ الكرامِ المكارمُ",
+  "original": null
+ },
+ {
+  "id": "mutanabbi-nufus",
+  "culture": "العالم العربي",
+  "sayer": "المتنبّي",
+  "source": "ديوان المتنبّي",
+  "text": "وإذا كانت النفوسُ كبارًا ... تعبت في مرادِها الأجسامُ",
+  "original": null
+ },
+ {
+  "id": "shabbi-mountains",
+  "culture": "تونس",
+  "sayer": "أبو القاسم الشابّي",
+  "source": "قصيدة «إرادة الحياة»",
+  "text": "ومَن لا يحبُّ صعودَ الجبالِ ... يعشْ أبدَ الدهرِ بين الحُفَرْ",
+  "original": null
+ },
+ {
+  "id": "shafii-kadd",
+  "culture": "العالم العربي",
+  "sayer": "الإمام الشافعي (منسوب)",
+  "source": "ديوان الشافعي",
+  "text": "بقدرِ الكدِّ تُكتسَبُ المعالي ... ومَن طلب العُلا سهرَ الليالي",
+  "original": null
+ },
+ {
+  "id": "shafii-safar",
+  "culture": "العالم العربي",
+  "sayer": "الإمام الشافعي (منسوب)",
+  "source": "ديوان الشافعي",
+  "text": "تغرّبْ عن الأوطانِ في طلبِ العُلا ... وسافرْ ففي الأسفارِ خمسُ فوائدِ",
+  "original": null
+ },
+ {
+  "id": "shawqi-ghilaba",
+  "culture": "مصر",
+  "sayer": "أحمد شوقي",
+  "source": "قصيدة «سلوا قلبي»",
+  "text": "وما نيلُ المطالبِ بالتمنّي ... ولكن تُؤخَذُ الدنيا غِلابا",
+  "original": null
+ },
+ {
+  "id": "tughrai-amal",
+  "culture": "العالم العربي",
+  "sayer": "الطُّغرائي",
+  "source": "«لاميّة العجم»",
+  "text": "أُعلِّلُ النفسَ بالآمالِ أرقبُها ... ما أضيقَ العيشَ لولا فسحةُ الأملِ",
+  "original": null
+ },
+ {
+  "id": "antara-izz",
+  "culture": "الجزيرة العربية",
+  "sayer": "عنترة بن شدّاد",
+  "source": "ديوان عنترة",
+  "text": "لا تسقني ماءَ الحياةِ بذلّةٍ ... بل فاسقني بالعزِّ كأسَ الحنظلِ",
+  "original": null
+ },
+ {
+  "id": "ali-qima",
+  "culture": "العالم العربي",
+  "sayer": "علي بن أبي طالب",
+  "source": "«نهج البلاغة»، الحكمة ٨١",
+  "text": "قيمةُ كلِّ امرئٍ ما يُحسِنُه.",
+  "original": null
+ },
+ {
+  "id": "ar-jadda",
+  "culture": "العالم العربي",
+  "sayer": "مثل عربي",
+  "source": "الأمثال العربية",
+  "text": "مَن جدَّ وجد، ومَن زرع حصد.",
+  "original": null
+ },
+ {
+  "id": "ar-sabr",
+  "culture": "العالم العربي",
+  "sayer": "مثل عربي",
+  "source": "الأمثال العربية",
+  "text": "الصبرُ مفتاحُ الفرج.",
+  "original": null
+ },
+ {
+  "id": "gibran-work",
+  "culture": "لبنان",
+  "sayer": "جبران خليل جبران",
+  "source": "كتاب «النبي»، ١٩٢٣",
+  "text": "العملُ هو الحبُّ وقد صار مرئيًّا.",
+  "original": "Work is love made visible."
+ },
+ {
+  "id": "ferdowsi-dana",
+  "culture": "فارس",
+  "sayer": "الفردوسي",
+  "source": "«الشاهنامه»",
+  "text": "مَن كان عالمًا كان قادرًا.",
+  "original": "توانا بود هر که دانا بود"
+ },
+ {
+  "id": "fa-qatre",
+  "culture": "فارس",
+  "sayer": "مثل فارسي",
+  "source": "الأمثال الفارسية",
+  "text": "قطرةً قطرة تجتمع، فإذا هي بحر.",
+  "original": "قطره قطره جمع گردد، وانگهی دریا شود"
+ },
+ {
+  "id": "tr-zarar",
+  "culture": "تركيا",
+  "sayer": "مثل تركي",
+  "source": "الأمثال التركية",
+  "text": "من أيّ نقطةٍ رجعتَ فيها عن الخسارة، فذلك ربح.",
+  "original": "Zararın neresinden dönülse kârdır"
+ },
+ {
+  "id": "hillel-now",
+  "culture": "التراث العبري",
+  "sayer": "هلّيل",
+  "source": "«أقوال الآباء» (پركي أفوت)، ١:١٤",
+  "text": "إن لم يكن الآن، فمتى؟",
+  "original": "ואם לא עכשיו, אימתי"
+ },
+ {
+  "id": "tarfon-work",
+  "culture": "التراث العبري",
+  "sayer": "الحاخام طرفون",
+  "source": "«أقوال الآباء» (پركي أفوت)، ٢:١٦",
+  "text": "ليس عليك أن تُتمَّ العمل، لكنك لستَ حرًّا في أن تتخلّى عنه.",
+  "original": null
+ },
+ {
+  "id": "seneca-1",
+  "culture": "روما القديمة",
+  "sayer": "سينيكا",
+  "source": "«رسائل إلى لوسيليوس»، الرسالة ١",
+  "text": "بينما نؤجّل، تمضي الحياةُ مسرعة.",
+  "original": "Dum differtur, vita transcurrit."
+ },
+ {
+  "id": "seneca-104",
+  "culture": "روما القديمة",
+  "sayer": "سينيكا",
+  "source": "«رسائل إلى لوسيليوس»، الرسالة ١٠٤",
+  "text": "لسنا نُحجم لأن الأمور صعبة، بل هي صعبةٌ لأننا نُحجم.",
+  "original": "Non quia difficilia sunt non audemus, sed quia non audemus difficilia sunt."
+ },
+ {
+  "id": "marcus-5-20",
+  "culture": "روما القديمة",
+  "sayer": "ماركوس أوريليوس",
+  "source": "«التأمّلات»، ٥:٢٠",
+  "text": "ما يعترض طريقَ العمل يدفعه إلى الأمام، وما يقف في الطريق يصير هو الطريق.",
+  "original": null
+ },
+ {
+  "id": "marcus-10-16",
+  "culture": "روما القديمة",
+  "sayer": "ماركوس أوريليوس",
+  "source": "«التأمّلات»، ١٠:١٦",
+  "text": "كفى جدالًا حول صفات الرجل الصالح؛ كُنْ واحدًا.",
+  "original": null
+ },
+ {
+  "id": "epictetus-sudden",
+  "culture": "اليونان القديمة",
+  "sayer": "إبيكتيتوس",
+  "source": "«المحادثات»، ١:١٥",
+  "text": "لا شيءَ عظيمًا يولد فجأة.",
+  "original": null
+ },
+ {
+  "id": "epictetus-views",
+  "culture": "اليونان القديمة",
+  "sayer": "إبيكتيتوس",
+  "source": "«المختصر» (الإنكيريديون)، ٥",
+  "text": "لا تُقلق الناسَ الأشياءُ نفسُها، بل آراؤهم فيها.",
+  "original": null
+ },
+ {
+  "id": "aristotle-habit",
+  "culture": "اليونان القديمة",
+  "sayer": "أرسطو",
+  "source": "«الأخلاق النيقوماخية»، الكتاب الثاني",
+  "text": "نصير عادلين بفعل العدل، ومعتدلين بفعل الاعتدال، وشجعانًا بفعل الشجاعة.",
+  "original": null
+ },
+ {
+  "id": "plato-beginning",
+  "culture": "اليونان القديمة",
+  "sayer": "أفلاطون",
+  "source": "«الجمهورية»",
+  "text": "البدايةُ أهمُّ جزءٍ في العمل.",
+  "original": null
+ },
+ {
+  "id": "socrates-examined",
+  "culture": "اليونان القديمة",
+  "sayer": "سقراط",
+  "source": "محاورة «الدفاع» لأفلاطون",
+  "text": "الحياةُ التي لا تُفحَص لا تستحقّ أن تُعاش.",
+  "original": null
+ },
+ {
+  "id": "archimedes-lever",
+  "culture": "اليونان القديمة",
+  "sayer": "أرخميدس",
+  "source": "كما نقله عنه بابوس السكندري",
+  "text": "أعطني موضعًا أقف عليه، وسأحرّك الأرض.",
+  "original": null
+ },
+ {
+  "id": "hippocrates-art",
+  "culture": "اليونان القديمة",
+  "sayer": "أبقراط",
+  "source": "«الفصول»، الفصل الأول",
+  "text": "العمرُ قصير، والصناعةُ طويلة.",
+  "original": "Ὁ βίος βραχύς, ἡ δὲ τέχνη μακρή"
+ },
+ {
+  "id": "virgil-possunt",
+  "culture": "روما القديمة",
+  "sayer": "فرجيل",
+  "source": "«الإنيادة»، ٥:٢٣١",
+  "text": "يستطيعون، لأنهم يرون أنهم يستطيعون.",
+  "original": "Possunt, quia posse videntur."
+ },
+ {
+  "id": "horace-sapere",
+  "culture": "روما القديمة",
+  "sayer": "هوراس",
+  "source": "«الرسائل»، ١:٢",
+  "text": "تجرّأْ على أن تعرف.",
+  "original": "Sapere aude."
+ },
+ {
+  "id": "horace-carpe",
+  "culture": "روما القديمة",
+  "sayer": "هوراس",
+  "source": "«الأناشيد»، ١:١١",
+  "text": "اغتنمْ يومَك، ولا تثقْ بالغد إلا قليلًا.",
+  "original": "Carpe diem, quam minimum credula postero."
+ },
+ {
+  "id": "ovid-drop",
+  "culture": "روما القديمة",
+  "sayer": "أوفيد",
+  "source": "«رسائل من البحر الأسود»، ٤:١٠",
+  "text": "قطراتُ الماء تحفر الصخر.",
+  "original": "Gutta cavat lapidem."
+ },
+ {
+  "id": "cicero-hope",
+  "culture": "روما القديمة",
+  "sayer": "شيشرون",
+  "source": "رسائله إلى أتيكوس، ٩:١٠",
+  "text": "ما دامت في المرء روح، فهناك أمل.",
+  "original": "Dum anima est, spes esse dicitur."
+ },
+ {
+  "id": "dante-feathers",
+  "culture": "إيطاليا",
+  "sayer": "دانتي أليغييري",
+  "source": "«الكوميديا الإلهية» — الجحيم، النشيد ٢٤",
+  "text": "لا يبلغ المرءُ المجدَ وهو جالسٌ على الريش.",
+  "original": "Seggendo in piuma, in fama non si vien."
+ },
+ {
+  "id": "cervantes-luck",
+  "culture": "إسبانيا",
+  "sayer": "ميغيل دي ثيربانتس",
+  "source": "رواية «دون كيخوته»",
+  "text": "مَن لا يُحسن اغتنامَ الحظّ حين يأتيه، لا يحقّ له أن يشكو إذا فاته.",
+  "original": "El que no sabe gozar de la ventura cuando le viene, no se debe quejar si se le pasa."
+ },
+ {
+  "id": "shakespeare-doubts",
+  "culture": "إنجلترا",
+  "sayer": "وليم شكسبير",
+  "source": "مسرحية «دقّة بدقّة»، الفصل الأول",
+  "text": "شكوكُنا خونة؛ تُضيّع علينا خيرًا كان في متناولنا، لأنها تُخيفنا من المحاولة.",
+  "original": "Our doubts are traitors, and make us lose the good we oft might win, by fearing to attempt."
+ },
+ {
+  "id": "goethe-do",
+  "culture": "ألمانيا",
+  "sayer": "يوهان فولفغانغ فون غوته",
+  "source": "رواية «سنوات تجوال فيلهلم مايستر»",
+  "text": "لا تكفي المعرفة، بل علينا أن نطبّق؛ ولا تكفي الإرادة، بل علينا أن نعمل.",
+  "original": "Es ist nicht genug zu wissen, man muß auch anwenden; es ist nicht genug zu wollen, man muß auch tun."
+ },
+ {
+  "id": "nietzsche-stronger",
+  "culture": "ألمانيا",
+  "sayer": "فريدريش نيتشه",
+  "source": "كتاب «أفول الأصنام»",
+  "text": "ما لا يقتلني يجعلني أقوى.",
+  "original": "Was mich nicht umbringt, macht mich stärker."
+ },
+ {
+  "id": "nietzsche-why",
+  "culture": "ألمانيا",
+  "sayer": "فريدريش نيتشه",
+  "source": "كتاب «أفول الأصنام»",
+  "text": "مَن يملك «لماذا» يعيش من أجلها، يستطيع أن يحتمل أيَّ «كيف».",
+  "original": null
+ },
+ {
+  "id": "kierkegaard-forwards",
+  "culture": "الدنمارك",
+  "sayer": "سورين كيركغارد",
+  "source": "يوميّاته، ١٨٤٣",
+  "text": "لا تُفهَم الحياةُ إلا بالنظر إلى الوراء، لكنها لا تُعاش إلا إلى الأمام.",
+  "original": null
+ },
+ {
+  "id": "rilke-questions",
+  "culture": "النمسا",
+  "sayer": "راينر ماريا ريلكه",
+  "source": "«رسائل إلى شاعر شاب»، ١٩٠٣",
+  "text": "كُن صبورًا تجاه كلّ ما لم يُحَلَّ في قلبك، وعِش الأسئلةَ الآن.",
+  "original": null
+ },
+ {
+  "id": "tolstoy-patience",
+  "culture": "روسيا",
+  "sayer": "ليو تولستوي",
+  "source": "رواية «الحرب والسلام»",
+  "text": "أقوى المحاربين اثنان: الوقتُ والصبر.",
+  "original": null
+ },
+ {
+  "id": "ru-fish",
+  "culture": "روسيا",
+  "sayer": "مثل روسي",
+  "source": "الأمثال الروسية",
+  "text": "بلا تعب، لن تُخرجَ حتى سمكةً صغيرة من البركة.",
+  "original": "Без труда не вытащишь и рыбку из пруда."
+ },
+ {
+  "id": "voltaire-best",
+  "culture": "فرنسا",
+  "sayer": "فولتير",
+  "source": "«القاموس الفلسفي»",
+  "text": "الأفضلُ عدوُّ الجيّد.",
+  "original": "Le mieux est l'ennemi du bien."
+ },
+ {
+  "id": "bacon-power",
+  "culture": "إنجلترا",
+  "sayer": "فرانسيس بيكون",
+  "source": "«تأمّلات مقدّسة»، ١٥٩٧",
+  "text": "المعرفةُ قوّة.",
+  "original": "Ipsa scientia potestas est."
+ },
+ {
+  "id": "machado-camino",
+  "culture": "إسبانيا",
+  "sayer": "أنطونيو ماتشادو",
+  "source": "ديوان «حقول قشتالة»، ١٩١٢",
+  "text": "أيها السائر، ليس ثمّة طريق؛ الطريقُ يُصنَع بالمشي.",
+  "original": "Caminante, no hay camino, se hace camino al andar."
+ },
+ {
+  "id": "de-anfang",
+  "culture": "ألمانيا",
+  "sayer": "مثل ألماني",
+  "source": "الأمثال الألمانية",
+  "text": "كلُّ بدايةٍ صعبة.",
+  "original": "Aller Anfang ist schwer."
+ },
+ {
+  "id": "fr-oiseau",
+  "culture": "فرنسا",
+  "sayer": "مثل فرنسي",
+  "source": "الأمثال الفرنسية",
+  "text": "شيئًا فشيئًا، يبني العصفورُ عشَّه.",
+  "original": "Petit à petit, l'oiseau fait son nid."
+ },
+ {
+  "id": "it-piano",
+  "culture": "إيطاليا",
+  "sayer": "مثل إيطالي",
+  "source": "الأمثال الإيطالية",
+  "text": "مَن يمشي بتأنٍّ، يمشي بسلامٍ ويصل بعيدًا.",
+  "original": "Chi va piano va sano e va lontano."
+ },
+ {
+  "id": "ie-plough",
+  "culture": "أيرلندا",
+  "sayer": "مثل أيرلندي",
+  "source": "الأمثال الأيرلندية",
+  "text": "لن تحرثَ الحقلَ بتقليبه في ذهنك.",
+  "original": "You'll never plough a field by turning it over in your mind."
+ },
+ {
+  "id": "es-querer",
+  "culture": "إسبانيا",
+  "sayer": "مثل إسباني",
+  "source": "الأمثال الإسبانية",
+  "text": "مَن أراد استطاع.",
+  "original": "Querer es poder."
+ },
+ {
+  "id": "frankl-attitude",
+  "culture": "النمسا",
+  "sayer": "فيكتور فرانكل",
+  "source": "كتاب «الإنسان يبحث عن المعنى»، ١٩٤٦",
+  "text": "يمكن أن يُسلَب من الإنسان كلُّ شيء إلا شيئًا واحدًا: حريّتُه في اختيار موقفه من أيّ ظرف.",
+  "original": null
+ },
+ {
+  "id": "camus-summer",
+  "culture": "فرنسا / الجزائر",
+  "sayer": "ألبير كامو",
+  "source": "مقالة «العودة إلى تيبازا»، ١٩٥٢",
+  "text": "في عمق الشتاء، اكتشفتُ أن في داخلي صيفًا لا يُقهَر.",
+  "original": "Au milieu de l'hiver, j'apprenais enfin qu'il y avait en moi un été invincible."
+ },
+ {
+  "id": "einstein-bicycle",
+  "culture": "ألمانيا / الولايات المتحدة",
+  "sayer": "ألبرت أينشتاين",
+  "source": "رسالة إلى ابنه إدوارد، ١٩٣٠",
+  "text": "الحياةُ كركوب الدرّاجة؛ لكي تحافظ على توازنك، عليك أن تواصل الحركة.",
+  "original": null
+ },
+ {
+  "id": "churchill-never",
+  "culture": "بريطانيا",
+  "sayer": "ونستون تشرشل",
+  "source": "خطابه في مدرسة هارو، ١٩٤١",
+  "text": "لا تستسلمْ أبدًا، أبدًا، أبدًا.",
+  "original": "Never give in, never, never, never."
+ },
+ {
+  "id": "edison-genius",
+  "culture": "الولايات المتحدة",
+  "sayer": "توماس إديسون",
+  "source": "مقولة نقلتها عنه الصحافة مطلع القرن العشرين",
+  "text": "العبقريةُ واحدٌ في المئة إلهام، وتسعةٌ وتسعون في المئة عَرَق.",
+  "original": "Genius is one per cent inspiration, ninety-nine per cent perspiration."
+ },
+ {
+  "id": "franklin-time",
+  "culture": "الولايات المتحدة",
+  "sayer": "بنجامين فرانكلين",
+  "source": "«تقويم ريتشارد المسكين»",
+  "text": "الوقتُ الضائع لا يُستعاد أبدًا.",
+  "original": "Lost time is never found again."
+ },
+ {
+  "id": "franklin-done",
+  "culture": "الولايات المتحدة",
+  "sayer": "بنجامين فرانكلين",
+  "source": "«تقويم ريتشارد المسكين»",
+  "text": "الفعلُ المُتقَن خيرٌ من القول المُتقَن.",
+  "original": "Well done is better than well said."
+ },
+ {
+  "id": "emerson-trust",
+  "culture": "الولايات المتحدة",
+  "sayer": "رالف والدو إمرسون",
+  "source": "مقالة «الاعتماد على النفس»، ١٨٤١",
+  "text": "ثِقْ بنفسك؛ فكلُّ قلبٍ يهتزّ لذلك الوتر الحديدي.",
+  "original": "Trust thyself: every heart vibrates to that iron string."
+ },
+ {
+  "id": "emerson-enthusiasm",
+  "culture": "الولايات المتحدة",
+  "sayer": "رالف والدو إمرسون",
+  "source": "مقالة «الدوائر»، ١٨٤١",
+  "text": "لم يُنجَز شيءٌ عظيمٌ قطّ دون حماسة.",
+  "original": "Nothing great was ever achieved without enthusiasm."
+ },
+ {
+  "id": "thoreau-dreams",
+  "culture": "الولايات المتحدة",
+  "sayer": "هنري ديفيد ثورو",
+  "source": "كتاب «والدن»، ١٨٥٤",
+  "text": "مَن تقدّم بثقةٍ في اتجاه أحلامه، لقي نجاحًا لم يكن يتوقّعه.",
+  "original": null
+ },
+ {
+  "id": "douglass-struggle",
+  "culture": "الولايات المتحدة",
+  "sayer": "فريدريك دوغلاس",
+  "source": "خطاب ذكرى تحرير جزر الهند الغربية، ١٨٥٧",
+  "text": "إذا لم يكن هناك كفاح، فلا تقدُّم.",
+  "original": "If there is no struggle, there is no progress."
+ },
+ {
+  "id": "keller-adventure",
+  "culture": "الولايات المتحدة",
+  "sayer": "هيلين كيلر",
+  "source": "كتاب «الباب المفتوح»، ١٩٥٧",
+  "text": "الحياةُ إمّا مغامرةٌ جريئة، وإمّا لا شيء.",
+  "original": "Life is either a daring adventure or nothing."
+ },
+ {
+  "id": "roosevelt-arena",
+  "culture": "الولايات المتحدة",
+  "sayer": "ثيودور روزفلت",
+  "source": "خطاب «المواطنة في الجمهورية»، باريس ١٩١٠",
+  "text": "ليس الفضلُ للناقد، بل لمن يقف في الحلبة فعلًا، ووجهُه مغطّى بالغبار والعرق.",
+  "original": null
+ },
+ {
+  "id": "mlk-keep-moving",
+  "culture": "الولايات المتحدة",
+  "sayer": "مارتن لوثر كينغ الابن",
+  "source": "خطاب «واصلوا التقدّم من هذا الجبل»، كلية سبِلمان",
+  "text": "إن لم تستطع الطيران فاركض، وإن لم تستطع الركض فامشِ، وإن لم تستطع المشي فازحف؛ المهمّ أن تواصل التقدّم.",
+  "original": null
+ },
+ {
+  "id": "jobs-time",
+  "culture": "الولايات المتحدة",
+  "sayer": "ستيف جوبز",
+  "source": "كلمته في حفل تخرّج جامعة ستانفورد، ٢٠٠٥",
+  "text": "وقتُك محدود، فلا تُضيّعه في عيش حياة شخصٍ آخر.",
+  "original": "Your time is limited, so don't waste it living someone else's life."
+ },
+ {
+  "id": "coelho-universe",
+  "culture": "البرازيل",
+  "sayer": "باولو كويلو",
+  "source": "رواية «الخيميائي»، ١٩٨٨",
+  "text": "حين تريد شيئًا بصدق، يتآمر الكونُ كلُّه لمساعدتك على تحقيقه.",
+  "original": null
+ },
+ {
+  "id": "mandela-courage",
+  "culture": "جنوب أفريقيا",
+  "sayer": "نيلسون مانديلا",
+  "source": "مذكّراته «مسيرة طويلة نحو الحرية»",
+  "text": "تعلّمتُ أن الشجاعة ليست غيابَ الخوف، بل الانتصارُ عليه.",
+  "original": "I learned that courage was not the absence of fear, but the triumph over it."
+ },
+ {
+  "id": "mandela-hills",
+  "culture": "جنوب أفريقيا",
+  "sayer": "نيلسون مانديلا",
+  "source": "مذكّراته «مسيرة طويلة نحو الحرية»",
+  "text": "بعد أن تتسلّق تلًّا عظيمًا، تكتشف أن أمامك تلالًا كثيرةً أخرى لتتسلّقها.",
+  "original": null
+ },
+ {
+  "id": "achebe-chi",
+  "culture": "نيجيريا",
+  "sayer": "تشينوا أتشيبي (مثل من الإيغبو)",
+  "source": "رواية «الأشياء تتداعى»، ١٩٥٨",
+  "text": "حين يقول المرءُ «نعم»، يقول قَدَرُه «نعم» أيضًا.",
+  "original": "When a man says yes, his chi says yes also."
+ },
+ {
+  "id": "sw-haba",
+  "culture": "شرق أفريقيا",
+  "sayer": "مثل سواحيلي",
+  "source": "الأمثال السواحيلية",
+  "text": "قليلًا قليلًا، يمتلئ المكيال.",
+  "original": "Haba na haba hujaza kibaba."
+ },
+ {
+  "id": "et-spider",
+  "culture": "إثيوبيا",
+  "sayer": "مثل إثيوبي",
+  "source": "الأمثال الأمهرية",
+  "text": "إذا اتّحدت خيوطُ العنكبوت، قيّدت أسدًا.",
+  "original": null
+ },
+ {
+  "id": "gh-sankofa",
+  "culture": "غانا",
+  "sayer": "مثل من شعب الأكان («سانكوفا»)",
+  "source": "حكمة الأكان الشعبية",
+  "text": "ليس عيبًا أن تعود لتأخذ ما نسيتَه.",
+  "original": "Se wo were fi na wosankofa a yenkyi."
+ },
+ {
+  "id": "maori-sun",
+  "culture": "نيوزيلندا (الماوري)",
+  "sayer": "مثل ماوري",
+  "source": "الأمثال الماورية (وهاكاتاوكي)",
+  "text": "أدِرْ وجهَك نحو الشمس، تسقطِ الظلالُ خلفك.",
+  "original": "Hurihia tō aroaro ki te rā, tukuna tō ātārangi kia taka ki muri i a koe."
+ }
+]
