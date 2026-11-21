@@ -41,6 +41,23 @@ final class HikmaStore: ObservableObject {
         return cycle.date(ofSlot: next)
     }
 
+    /// Today's slots for the home cards. Before the first quote of a new cycle,
+    /// the day of the first quote is shown instead.
+    var todaySlots: [Int] {
+        guard let cycle else { return [] }
+        let today = cycle.slots(onDayOf: now)
+        if !today.isEmpty { return today }
+        guard let next = cycle.nextSlot(after: now) else { return [] }
+        return cycle.slots(onDayOf: cycle.date(ofSlot: next))
+    }
+
+    /// The card to open on: the latest delivered today, otherwise the first.
+    var startingTodaySlot: Int? {
+        let slots = todaySlots
+        if let latest = latestSlot, slots.contains(latest) { return latest }
+        return slots.first
+    }
+
     /// Delivered slots, newest first.
     var deliveredSlots: [Int] {
         guard let latest = latestSlot else { return [] }
@@ -87,7 +104,7 @@ final class HikmaStore: ObservableObject {
     func openFromNotification(slot: Int) {
         guard let cycle, cycle.order.indices.contains(slot) else { return }
         now = Date()
-        focusedSlot = slot == latestSlot ? nil : slot
+        focusedSlot = slot
     }
 
     func sendTest() async {

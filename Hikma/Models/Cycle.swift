@@ -48,6 +48,11 @@ struct Cycle: Codable, Equatable {
         min(slot / Self.slotsPerDay + 1, Self.days)
     }
 
+    /// Slots that fall on the same calendar day as `date` (six on a normal day).
+    func slots(onDayOf date: Date, calendar: Calendar = .current) -> [Int] {
+        (0..<Self.totalSlots).filter { calendar.isDate(self.date(ofSlot: $0), inSameDayAs: date) }
+    }
+
     /// The first upcoming time on the 4-hour grid anchored at `startHour`:00.
     static func firstSlot(after now: Date, startHour: Int, calendar: Calendar = .current) -> Date {
         let anchor = calendar.date(bySettingHour: startHour, minute: 0, second: 0, of: now) ?? now

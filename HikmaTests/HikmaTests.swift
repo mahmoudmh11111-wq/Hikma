@@ -37,6 +37,12 @@ final class HikmaTests: XCTestCase {
         XCTAssertEqual(calendar.component(.minute, from: first), 0)
     }
 
+    func testEachFullDayHasSixSlots() throws {
+        let cycle = try XCTUnwrap(Cycle.make(startHour: 8, now: Date(), ids: ids, previous: nil))
+        let middle = cycle.date(ofSlot: 40)
+        XCTAssertEqual(cycle.slots(onDayOf: middle).count, 6)
+    }
+
     func testPlanRespectsTheSixtyFourLimit() throws {
         let now = Date()
         let cycle = try XCTUnwrap(Cycle.make(startHour: 8, now: now, ids: ids, previous: nil))

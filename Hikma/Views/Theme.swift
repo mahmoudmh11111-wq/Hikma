@@ -13,6 +13,12 @@ enum Theme {
             ? UIColor(white: 0.93, alpha: 1)
             : UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1)
     })
+    /// Cards sit slightly lifted off the paper.
+    static let card = Color(uiColor: UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(red: 0.12, green: 0.12, blue: 0.13, alpha: 1)
+            : UIColor.white
+    })
     /// The one accent: a muted sand gold.
     static let accent = Color(red: 0.71, green: 0.55, blue: 0.33)
 

@@ -23,25 +23,24 @@ struct HomeView: View {
     @EnvironmentObject private var store: HikmaStore
     @State private var showsArchive = false
     @State private var showsSettings = false
-    @State private var showsOriginal = false
 
     private let clock = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            Spacer(minLength: 24)
-            ScrollView(.vertical, showsIndicators: false) {
-                content
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 40)
+                .padding(.horizontal, 16)
+            if store.todaySlots.isEmpty {
+                Spacer()
+                Text("أول حكمة في الطريق إليك")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Theme.ink)
+                Spacer()
+            } else {
+                TodayCardsView()
             }
-            .scrollBounceBehavior(.basedOnSize)
-            Spacer(minLength: 24)
-            footer
         }
-        .padding(.horizontal, 28)
-        .padding(.vertical, 16)
+        .padding(.vertical, 12)
         .onReceive(clock) { _ in store.tick() }
         .sheet(isPresented: $showsArchive) { ArchiveView() }
         .sheet(isPresented: $showsSettings) { SettingsView() }
@@ -51,57 +50,17 @@ struct HomeView: View {
         HStack {
             iconButton("list.bullet") { showsArchive = true }
             Spacer()
-            Text("اليوم \(Arabic.number(store.currentDay)) من \(Arabic.number(Cycle.days))")
-                .font(Theme.smallFont)
-                .foregroundStyle(.secondary)
-            Spacer()
-            iconButton("slider.horizontal.3") { showsSettings = true }
-        }
-    }
-
-    @ViewBuilder private var content: some View {
-        if let slot = store.displayedSlot, let quote = store.cycle?.quote(ofSlot: slot) {
-            QuoteView(quote: quote, showsOriginal: showsOriginal)
-                .id(quote.id)
-                .transition(.opacity)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.25)) { showsOriginal.toggle() }
-                }
-        } else {
-            VStack(spacing: 14) {
-                Text("أول حكمة في الطريق إليك")
-                    .font(.system(size: 22, weight: .regular))
+            VStack(spacing: 2) {
+                Text("حِكَم اليوم")
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.ink)
-                if let next = store.nextDate {
-                    Text("تصلك الساعة \(Arabic.time(next))")
-                        .font(Theme.sourceFont)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
-    }
-
-    private var footer: some View {
-        HStack {
-            if store.focusedSlot != nil {
-                Button("عرض الأحدث") { withAnimation { store.focusedSlot = nil } }
-                    .font(Theme.smallFont)
-            } else if let next = store.nextDate {
-                Text("الحكمة التالية \(Arabic.time(next))")
-                    .font(Theme.smallFont)
+                Text("اليوم \(Arabic.number(store.currentDay)) من \(Arabic.number(Cycle.days))")
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            if let slot = store.displayedSlot, let quote = store.cycle?.quote(ofSlot: slot) {
-                ShareLink(item: quote.shareText) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 17, weight: .light))
-                        .frame(width: 44, height: 44)
-                }
-            }
+            iconButton("slider.horizontal.3") { showsSettings = true }
         }
-        .foregroundStyle(Theme.ink)
     }
 
     private func iconButton(_ name: String, action: @escaping () -> Void) -> some View {
@@ -111,6 +70,132 @@ struct HomeView: View {
                 .frame(width: 44, height: 44)
         }
         .foregroundStyle(Theme.ink)
+    }
+}
+
+// MARK: - Today's cards
+
+/// Today's six sayings, one card per screen; swipe between them.
+struct TodayCardsView: View {
+    @EnvironmentObject private var store: HikmaStore
+    @State private var selected: Int?
+    @State private var originals: Set<Int> = []
+
+    var body: some View {
+        let slots = store.todaySlots
+        VStack(spacing: 0) {
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 0) {
+                    ForEach(slots, id: \.self) { slot in
+                        card(slot: slot, position: (slots.firstIndex(of: slot) ?? 0) + 1, total: slots.count)
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 20)
+                            .containerRelativeFrame([.horizontal, .vertical])
+                            .scrollTransition(axis: .horizontal) { content, phase in
+                                content
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.9)
+                                    .opacity(phase.isIdentity ? 1 : 0.4)
+                                    .rotation3DEffect(.degrees(phase.value * -8), axis: (x: 0, y: 1, z: 0))
+                            }
+                            .id(slot)
+                    }
+                }
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.paging)
+            .scrollIndicators(.hidden)
+            .scrollPosition(id: $selected)
+
+            footer(slots: slots)
+                .padding(.horizontal, 28)
+        }
+        .onAppear { selected = store.focusedSlot ?? store.startingTodaySlot }
+        .onChange(of: store.focusedSlot) { _, slot in
+            if let slot, slots.contains(slot) {
+                withAnimation(.spring(duration: 0.5)) { selected = slot }
+            }
+        }
+        .onChange(of: store.latestSlot) { _, slot in
+            if let slot, slots.contains(slot) {
+                withAnimation(.spring(duration: 0.5)) { selected = slot }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func card(slot: Int, position: Int, total: Int) -> some View {
+        if let cycle = store.cycle, let quote = cycle.quote(ofSlot: slot) {
+            let date = cycle.date(ofSlot: slot)
+            let isUpcoming = date > store.now
+            let isCurrent = slot == store.latestSlot
+            VStack(spacing: 0) {
+                HStack {
+                    Text(isUpcoming ? "تصلك \(Arabic.time(date))" : Arabic.time(date))
+                        .font(.system(size: 12, weight: .semibold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(isCurrent ? Theme.accent : Theme.accent.opacity(0.12), in: Capsule())
+                        .foregroundStyle(isCurrent ? Color.white : Theme.accent)
+                    Spacer()
+                    Text("\(Arabic.number(position)) / \(Arabic.number(total))")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 16)
+                QuoteView(quote: quote, showsOriginal: originals.contains(slot))
+                Spacer(minLength: 16)
+                Text(originals.contains(slot) ? "اضغط لإخفاء النص الأصلي" : "اضغط لعرض النص الأصلي")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                    .opacity(quote.original == nil ? 0 : 1)
+            }
+            .padding(26)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .strokeBorder(Theme.ink.opacity(0.06), lineWidth: 1)
+            )
+            .shadow(color: .black.opacity(0.06), radius: 18, x: 0, y: 10)
+            .contentShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .onTapGesture {
+                guard quote.original != nil else { return }
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    if originals.contains(slot) { originals.remove(slot) } else { originals.insert(slot) }
+                }
+            }
+        }
+    }
+
+    private func footer(slots: [Int]) -> some View {
+        HStack {
+            if let next = store.nextDate {
+                Text("الحكمة التالية \(Arabic.time(next))")
+                    .font(Theme.smallFont)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            HStack(spacing: 6) {
+                ForEach(slots, id: \.self) { slot in
+                    Capsule()
+                        .fill(slot == selected ? Theme.accent : Theme.ink.opacity(0.15))
+                        .frame(width: slot == selected ? 18 : 6, height: 6)
+                        .onTapGesture { withAnimation(.spring(duration: 0.5)) { selected = slot } }
+                }
+            }
+            .animation(.spring(duration: 0.35), value: selected)
+            Spacer()
+            if let slot = selected, let quote = store.cycle?.quote(ofSlot: slot) {
+                ShareLink(item: quote.shareText) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 17, weight: .light))
+                        .frame(width: 44, height: 44)
+                }
+                .foregroundStyle(Theme.ink)
+            } else {
+                Color.clear.frame(width: 44, height: 44)
+            }
+        }
     }
 }
 
