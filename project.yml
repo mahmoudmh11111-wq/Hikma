@@ -49,6 +49,25 @@ targets:
         BGTaskSchedulerPermittedIdentifiers:
           - com.hikma.app.refresh
         ITSAppUsesNonExemptEncryption: false
+        # Reading plans (.hikmabook) open in Hikma, e.g. from Files or a chat app's "Open in…".
+        LSSupportsOpeningDocumentsInPlace: false
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Hikma Book
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Owner
+            LSItemContentTypes:
+              - com.hikma.book
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: com.hikma.book
+            UTTypeDescription: Hikma Book
+            UTTypeConformsTo:
+              - public.json
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - hikmabook
+              public.mime-type:
+                - application/x-hikma-book
   HikmaTests:
     type: bundle.unit-test
     platform: iOS

@@ -14,10 +14,25 @@ final class HikmaStore: ObservableObject {
     @Published private(set) var startHour: Int = 8
     /// A slot opened from a notification; shown on the home screen instead of the latest.
     @Published var focusedSlot: Int?
+    /// Whether the 4-hourly sayings are sent.
+    @Published private(set) var sayingsEnabled = true
+
+    /// Imported reading plans.
+    @Published private(set) var books: [Book] = []
+    /// The book currently being delivered, if any.
+    @Published private(set) var bookRun: BookRun?
+    /// A book card opened from a notification.
+    @Published var focusedCard: Int?
+    /// Set when a book was just imported, so the library can open it.
+    @Published var justImportedBookID: String?
+    /// Shown when an imported file could not be read.
+    @Published var importError: String?
 
     private enum Keys {
         static let cycle = "hikma.cycle"
         static let startHour = "hikma.startHour"
+        static let sayingsEnabled = "hikma.sayingsEnabled"
+        static let bookRun = "hikma.bookRun"
     }
 
     private init() {
@@ -26,6 +41,99 @@ final class HikmaStore: ObservableObject {
         if let data = defaults.data(forKey: Keys.cycle),
            let saved = try? JSONDecoder().decode(Cycle.self, from: data) {
             cycle = saved
+        }
+        if defaults.object(forKey: Keys.sayingsEnabled) != nil {
+            sayingsEnabled = defaults.bool(forKey: Keys.sayingsEnabled)
+        }
+        books = BookShelf.loadAll()
+        if let data = defaults.data(forKey: Keys.bookRun),
+           let run = try? JSONDecoder().decode(BookRun.self, from: data),
+           books.contains(where: { $0.id == run.bookID }) {
+            bookRun = run
+        }
+    }
+
+    // MARK: - Books
+
+    var activeBook: Book? {
+        guard let run = bookRun else { return nil }
+        return books.first { $0.id == run.bookID }
+    }
+
+    var latestCard: Int? { bookRun?.latestDelivered(at: now) }
+
+    var nextCardDate: Date? {
+        guard let run = bookRun, let next = run.nextCard(after: now) else { return nil }
+        return run.dates[next]
+    }
+
+    /// Progress (0…1) through the active book.
+    var bookProgress: Double {
+        guard let run = bookRun, run.count > 0 else { return 0 }
+        return Double((latestCard ?? -1) + 1) / Double(run.count)
+    }
+
+    func progress(of book: Book) -> (delivered: Int, total: Int, isActive: Bool) {
+        guard let run = bookRun, run.bookID == book.id else { return (0, book.cards.count, false) }
+        return ((latestCard ?? -1) + 1, run.count, true)
+    }
+
+    /// Imports a `.hikmabook` file (from Files, AirDrop, Mail or a chat app).
+    @discardableResult
+    func importBook(from url: URL) throws -> Book {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        let data = try Data(contentsOf: url)
+        let book = try Book.decode(data)
+        try BookShelf.save(data, id: book.id)
+        books.removeAll { $0.id == book.id }
+        books.insert(book, at: 0)
+        justImportedBookID = book.id
+        return book
+    }
+
+    func startBook(_ book: Book, perDay: Int) async {
+        if !notificationsAllowed || cycle == nil {
+            notificationsAllowed = await NotificationScheduler.requestPermission()
+        }
+        now = Date()
+        let run = BookRun.make(book: book, perDay: perDay, sayingsStartHour: startHour, now: now)
+        saveRun(run)
+        focusedCard = nil
+        await refresh()
+    }
+
+    func stopBook() async {
+        saveRun(nil)
+        focusedCard = nil
+        await refresh()
+    }
+
+    func deleteBook(_ book: Book) async {
+        if bookRun?.bookID == book.id { saveRun(nil) }
+        BookShelf.delete(id: book.id)
+        books.removeAll { $0.id == book.id }
+        await refresh()
+    }
+
+    func setSayingsEnabled(_ enabled: Bool) async {
+        sayingsEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: Keys.sayingsEnabled)
+        await refresh()
+    }
+
+    func openFromNotification(card: Int) {
+        guard let run = bookRun, run.dates.indices.contains(card) else { return }
+        now = Date()
+        focusedCard = card
+    }
+
+    private func saveRun(_ run: BookRun?) {
+        bookRun = run
+        if let run, let data = try? JSONEncoder().encode(run) {
+            UserDefaults.standard.set(data, forKey: Keys.bookRun)
+        } else {
+            UserDefaults.standard.removeObject(forKey: Keys.bookRun)
         }
     }
 
@@ -87,7 +195,10 @@ final class HikmaStore: ObservableObject {
     func refresh() async {
         now = Date()
         notificationsAllowed = await NotificationScheduler.isAuthorized()
-        guard var current = cycle else { return }
+        guard var current = cycle else {
+            await NotificationScheduler.apply(sayings: nil, book: activeBook, run: bookRun, now: now)
+            return
+        }
         if current.isFinished(at: now),
            let next = Cycle.make(startHour: startHour, now: now,
                                  ids: QuoteLibrary.all.map(\.id), previous: current) {
@@ -95,7 +206,8 @@ final class HikmaStore: ObservableObject {
             current = next
             focusedSlot = nil
         }
-        await NotificationScheduler.apply(cycle: current, now: now)
+        await NotificationScheduler.apply(sayings: sayingsEnabled ? current : nil,
+                                          book: activeBook, run: bookRun, now: now)
         BackgroundRefresh.schedule()
     }
 
@@ -109,7 +221,13 @@ final class HikmaStore: ObservableObject {
 
     func sendTest() async {
         let quote = displayedSlot.flatMap { cycle?.quote(ofSlot: $0) } ?? QuoteLibrary.all.first
-        if let quote { await NotificationScheduler.sendTest(quote) }
+        if let quote { await NotificationScheduler.sendTest(NotificationScheduler.content(for: quote, slot: nil)) }
+    }
+
+    func sendBookTest() async {
+        guard let book = activeBook ?? books.first else { return }
+        let index = latestCard ?? 0
+        await NotificationScheduler.sendTest(NotificationScheduler.content(for: book, cardIndex: index))
     }
 
     func openSystemSettings() {
@@ -136,5 +254,41 @@ enum BackgroundRefresh {
         let request = BGAppRefreshTaskRequest(identifier: identifier)
         request.earliestBeginDate = Date().addingTimeInterval(12 * 60 * 60)
         try? BGTaskScheduler.shared.submit(request)
+    }
+}
+
+/// Imported books live as files in Documents/Books.
+enum BookShelf {
+    static var folder: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let url = docs.appendingPathComponent("Books", isDirectory: true)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
+    }
+
+    static func url(for id: String) -> URL {
+        let safe = id.replacingOccurrences(of: "/", with: "-")
+        return folder.appendingPathComponent(safe).appendingPathExtension("hikmabook")
+    }
+
+    static func save(_ data: Data, id: String) throws {
+        try data.write(to: url(for: id), options: .atomic)
+    }
+
+    static func delete(id: String) {
+        try? FileManager.default.removeItem(at: url(for: id))
+    }
+
+    static func loadAll() -> [Book] {
+        let files = (try? FileManager.default.contentsOfDirectory(
+            at: folder, includingPropertiesForKeys: [.contentModificationDateKey])) ?? []
+        return files
+            .filter { $0.pathExtension == "hikmabook" }
+            .sorted {
+                let a = (try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                let b = (try? $1.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                return a > b
+            }
+            .compactMap { try? Book.decode(Data(contentsOf: $0)) }
     }
 }

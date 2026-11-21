@@ -14,15 +14,26 @@ struct RootView: View {
         }
         .tint(Theme.ink)
         .animation(.easeInOut(duration: 0.3), value: store.cycle == nil)
+        .alert("تعذّر فتح الملف", isPresented: Binding(
+            get: { store.importError != nil },
+            set: { if !$0 { store.importError = nil } })) {
+            Button("حسنًا", role: .cancel) {}
+        } message: {
+            Text(store.importError ?? "")
+        }
     }
 }
 
 // MARK: - Home
 
+enum HomeMode: Hashable { case sayings, book }
+
 struct HomeView: View {
     @EnvironmentObject private var store: HikmaStore
     @State private var showsArchive = false
     @State private var showsSettings = false
+    @State private var showsLibrary = false
+    @State private var mode: HomeMode = .sayings
 
     private let clock = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
@@ -30,7 +41,14 @@ struct HomeView: View {
         VStack(spacing: 0) {
             header
                 .padding(.horizontal, 16)
-            if store.todaySlots.isEmpty {
+            if store.activeBook != nil {
+                modePicker
+                    .padding(.top, 4)
+            }
+            if mode == .book, store.activeBook != nil {
+                BookCardsView()
+                    .transition(.opacity)
+            } else if store.todaySlots.isEmpty {
                 Spacer()
                 Text("أول حكمة في الطريق إليك")
                     .font(.system(size: 22))
@@ -44,14 +62,54 @@ struct HomeView: View {
         .onReceive(clock) { _ in store.tick() }
         .sheet(isPresented: $showsArchive) { ArchiveView() }
         .sheet(isPresented: $showsSettings) { SettingsView() }
+        .sheet(isPresented: $showsLibrary) { LibraryView() }
+        .onAppear { if !store.sayingsEnabled && store.activeBook != nil { mode = .book } }
+        .onChange(of: store.focusedCard) { _, card in
+            if card != nil { withAnimation { mode = .book } }
+        }
+        .onChange(of: store.focusedSlot) { _, slot in
+            if slot != nil { withAnimation { mode = .sayings } }
+        }
+        .onChange(of: store.justImportedBookID) { _, id in
+            if id != nil { showsLibrary = true }
+        }
+        .onChange(of: store.bookRun) { _, run in
+            withAnimation { mode = run == nil ? .sayings : .book }
+        }
+    }
+
+    private var modePicker: some View {
+        HStack(spacing: 28) {
+            modeButton("حِكَم اليوم", .sayings)
+            modeButton(store.activeBook?.title ?? "الكتاب", .book)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private func modeButton(_ title: String, _ value: HomeMode) -> some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.25)) { mode = value }
+        } label: {
+            VStack(spacing: 6) {
+                Text(title)
+                    .font(.system(size: 14, weight: mode == value ? .semibold : .regular))
+                    .foregroundStyle(mode == value ? Theme.ink : Color.secondary)
+                    .lineLimit(1)
+                Capsule()
+                    .fill(mode == value ? Theme.accent : Color.clear)
+                    .frame(width: 22, height: 2)
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var header: some View {
-        HStack {
+        HStack(spacing: 0) {
             iconButton("list.bullet") { showsArchive = true }
+            iconButton("books.vertical") { showsLibrary = true }
             Spacer()
             VStack(spacing: 2) {
-                Text("حِكَم اليوم")
+                Text(mode == .book && store.activeBook != nil ? "القراءة" : "حِكَم اليوم")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                 Text("اليوم \(Arabic.number(store.currentDay)) من \(Arabic.number(Cycle.days))")
@@ -59,6 +117,7 @@ struct HomeView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            Color.clear.frame(width: 44, height: 44)
             iconButton("slider.horizontal.3") { showsSettings = true }
         }
     }

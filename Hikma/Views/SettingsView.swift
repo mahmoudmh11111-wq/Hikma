@@ -18,6 +18,14 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    Toggle("حكمة كل أربع ساعات", isOn: Binding(
+                        get: { store.sayingsEnabled },
+                        set: { value in Task { await store.setSayingsEnabled(value) } }))
+                } footer: {
+                    Text("أوقفها إن أردت أن تصلك بطاقات الكتاب وحدها.")
+                }
+
+                Section {
                     SchedulePicker(startHour: $newStartHour)
                         .listRowBackground(Color.clear)
                     if newStartHour % 4 != store.startHour % 4 {
@@ -33,6 +41,11 @@ struct SettingsView: View {
                         Task { await store.sendTest() }
                     }
                     .disabled(sentTest)
+                    if store.activeBook != nil {
+                        Button("أرسل بطاقة كتاب تجريبية") {
+                            Task { await store.sendBookTest() }
+                        }
+                    }
                     Button("ابدأ دورة جديدة الآن") {
                         newStartHour = store.startHour
                         confirmsRestart = true

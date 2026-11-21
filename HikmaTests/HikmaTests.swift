@@ -46,17 +46,54 @@ final class HikmaTests: XCTestCase {
     func testPlanRespectsTheSixtyFourLimit() throws {
         let now = Date()
         let cycle = try XCTUnwrap(Cycle.make(startHour: 8, now: now, ids: ids, previous: nil))
-        let plan = NotificationScheduler.plan(for: cycle, now: now)
-        XCTAssertEqual(plan.slots.count, 63)
-        XCTAssertEqual(plan.slots.first, 0)
+        let plan = NotificationScheduler.plan(sayings: cycle, book: nil, now: now)
+        XCTAssertEqual(plan.items.count, 63)
+        XCTAssertEqual(plan.sayingSlots.first, 0)
         XCTAssertFalse(plan.reminderEndsCycle)
         XCTAssertEqual(plan.reminderDate, cycle.date(ofSlot: 63))
 
         // Ten days in, the rest fits and the reminder announces the end.
         let later = cycle.date(ofSlot: 60).addingTimeInterval(60)
-        let late = NotificationScheduler.plan(for: cycle, now: later)
-        XCTAssertEqual(late.slots, Array(61..<84))
+        let late = NotificationScheduler.plan(sayings: cycle, book: nil, now: later)
+        XCTAssertEqual(late.sayingSlots, Array(61..<84))
         XCTAssertTrue(late.reminderEndsCycle)
+    }
+
+    private func sampleBook(cards: Int) -> Book {
+        Book(format: 1, id: "test", title: "كتاب", originalTitle: nil, author: "مؤلف", year: nil,
+             about: "عن الكتاب",
+             cards: (0..<cards).map { BookCard(id: "c\($0)", chapter: "الفصل", title: "عنوان \($0)",
+                                               body: "نص", apply: nil) })
+    }
+
+    func testBookRunDeliversEveryCardInOrderBetweenSayings() throws {
+        let now = Date()
+        let book = sampleBook(cards: 59)
+        let run = BookRun.make(book: book, perDay: 3, sayingsStartHour: 8, now: now)
+        XCTAssertEqual(run.count, 59)
+        XCTAssertEqual(run.dates, run.dates.sorted())
+        XCTAssertGreaterThan(run.dates[0], now)
+        XCTAssertEqual(BookRun.dailyHours(sayingsStartHour: 8, perDay: 3), [10, 14, 18])
+        XCTAssertEqual(BookRun.dailyHours(sayingsStartHour: 8, perDay: 6), [2, 6, 10, 14, 18, 22])
+        XCTAssertEqual(BookRun.days(cards: 59, perDay: 3), 20)
+        let hours = Set(run.dates.map { Calendar.current.component(.hour, from: $0) })
+        XCTAssertEqual(hours, [10, 14, 18])
+    }
+
+    func testMergedPlanKeepsBothStreamsUnderTheLimit() throws {
+        let now = Date()
+        let cycle = try XCTUnwrap(Cycle.make(startHour: 8, now: now, ids: ids, previous: nil))
+        let run = BookRun.make(book: sampleBook(cards: 59), perDay: 3, sayingsStartHour: 8, now: now)
+        let plan = NotificationScheduler.plan(sayings: cycle, book: run, now: now)
+        XCTAssertEqual(plan.items.count, 63)
+        XCTAssertEqual(plan.items.map(\.date), plan.items.map(\.date).sorted())
+        XCTAssertFalse(plan.cardIndices.isEmpty)
+        XCTAssertEqual(plan.cardIndices, Array(0..<plan.cardIndices.count))
+        XCTAssertNotNil(plan.reminderDate)
+
+        let bookOnly = NotificationScheduler.plan(sayings: nil, book: run, now: now)
+        XCTAssertEqual(bookOnly.cardIndices, Array(0..<59))
+        XCTAssertNil(bookOnly.reminderDate)
     }
 
     func testNextCyclePrefersQuotesNotJustSeen() throws {
