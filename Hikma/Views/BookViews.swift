@@ -186,7 +186,7 @@ struct BookCardView: View {
                         .fixedSize(horizontal: false, vertical: true)
                     if let apply = card.apply, !apply.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("طبّقها")
+                            Text(book.applyLabel)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(Theme.accent)
                             Text(apply)
@@ -215,6 +215,7 @@ struct BookCardView: View {
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .cardBackground()
+        .environment(\.layoutDirection, book.direction)
     }
 }
 
@@ -234,8 +235,9 @@ extension View {
 extension BookCard {
     func shareText(book: Book) -> String {
         var text = "\(title)\n\n\(body)"
-        if let apply, !apply.isEmpty { text += "\n\nطبّقها: \(apply)" }
-        text += "\n\n— من «\(book.title)»، \(book.author)"
+        if let apply, !apply.isEmpty { text += "\n\n\(book.applyLabel): \(apply)" }
+        text += book.isEnglish ? "\n\n— from “\(book.title)”, \(book.author)"
+                               : "\n\n— من «\(book.title)»، \(book.author)"
         return text
     }
 }

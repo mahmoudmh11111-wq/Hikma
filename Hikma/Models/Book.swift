@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 import UniformTypeIdentifiers
 
 extension UTType {
@@ -17,9 +18,19 @@ struct Book: Codable, Identifiable, Equatable {
     /// Topic for the feed filter, e.g. "الاقتصاد والتنمية". Older files without one go to "عام".
     let topic: String?
     let about: String
+    /// "en" or "ar". Older files have none: the title decides (Arabic letters → Arabic).
+    let language: String?
     let cards: [BookCard]
 
     var topicName: String { (topic?.isEmpty == false ? topic : nil) ?? "عام" }
+
+    /// English cards read left to right; Arabic ones right to left.
+    var isEnglish: Bool {
+        if let language { return language.lowercased().hasPrefix("en") }
+        return !title.unicodeScalars.contains { (0x0600...0x06FF).contains($0.value) }
+    }
+    var direction: LayoutDirection { isEnglish ? .leftToRight : .rightToLeft }
+    var applyLabel: String { isEnglish ? "Apply it" : "طبّقها" }
 
     static func decode(_ data: Data) throws -> Book {
         let book = try JSONDecoder().decode(Book.self, from: data)

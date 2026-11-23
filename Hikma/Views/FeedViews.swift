@@ -214,7 +214,7 @@ struct FeedCard: View {
                     .minimumScaleFactor(0.85)
                 if let apply = card.apply, !apply.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("طبّقها")
+                        Text(book.applyLabel)
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(Theme.accent)
                         Text(apply)
@@ -226,6 +226,7 @@ struct FeedCard: View {
                     .padding(.top, 2)
                 }
             }
+            .environment(\.layoutDirection, book.direction)
         }
     }
 

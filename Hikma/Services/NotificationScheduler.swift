@@ -146,7 +146,7 @@ enum NotificationScheduler {
         content.title = card.title
         content.subtitle = "\(book.title) · \(cardIndex + 1)/\(book.cards.count)"
         var body = card.body
-        if let apply = card.apply, !apply.isEmpty { body += "\n\nطبّقها: " + apply }
+        if let apply = card.apply, !apply.isEmpty { body += "\n\n\(book.applyLabel): " + apply }
         content.body = body
         content.sound = .default
         content.threadIdentifier = "hikma.book"
