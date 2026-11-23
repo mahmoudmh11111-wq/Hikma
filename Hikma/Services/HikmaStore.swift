@@ -27,12 +27,15 @@ final class HikmaStore: ObservableObject {
     @Published var justImportedBookID: String?
     /// Shown when an imported file could not be read.
     @Published var importError: String?
+    /// Ideas saved from the feed (FeedItem ids), newest first.
+    @Published private(set) var savedIDs: [String] = []
 
     private enum Keys {
         static let cycle = "hikma.cycle"
         static let startHour = "hikma.startHour"
         static let sayingsEnabled = "hikma.sayingsEnabled"
         static let bookRun = "hikma.bookRun"
+        static let saved = "hikma.saved"
     }
 
     private init() {
@@ -45,12 +48,36 @@ final class HikmaStore: ObservableObject {
         if defaults.object(forKey: Keys.sayingsEnabled) != nil {
             sayingsEnabled = defaults.bool(forKey: Keys.sayingsEnabled)
         }
+        savedIDs = defaults.stringArray(forKey: Keys.saved) ?? []
         books = BookShelf.loadAll()
         if let data = defaults.data(forKey: Keys.bookRun),
            let run = try? JSONDecoder().decode(BookRun.self, from: data),
            books.contains(where: { $0.id == run.bookID }) {
             bookRun = run
         }
+    }
+
+    // MARK: - Feed & saved
+
+    func feed(_ filter: FeedFilter) -> [FeedItem] {
+        Feed.items(filter: filter, quotes: QuoteLibrary.all, books: books, day: now)
+    }
+
+    func isSaved(_ item: FeedItem) -> Bool { savedIDs.contains(item.id) }
+
+    func toggleSaved(_ item: FeedItem) {
+        if let index = savedIDs.firstIndex(of: item.id) {
+            savedIDs.remove(at: index)
+        } else {
+            savedIDs.insert(item.id, at: 0)
+        }
+        UserDefaults.standard.set(savedIDs, forKey: Keys.saved)
+    }
+
+    /// Saved items that still exist (a deleted book's cards drop out).
+    var savedItems: [FeedItem] {
+        let all = Dictionary(feed(.all).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return savedIDs.compactMap { all[$0] }
     }
 
     // MARK: - Books

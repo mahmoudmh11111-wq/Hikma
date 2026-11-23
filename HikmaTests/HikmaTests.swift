@@ -96,6 +96,24 @@ final class HikmaTests: XCTestCase {
         XCTAssertNil(bookOnly.reminderDate)
     }
 
+    func testFeedMixesEverythingAndKeepsBookOrder() {
+        let book = sampleBook(cards: 20)
+        let today = Date()
+        let feed = Feed.items(filter: .all, quotes: QuoteLibrary.all, books: [book], day: today)
+        XCTAssertEqual(feed.count, QuoteLibrary.all.count + 20)
+        XCTAssertEqual(Set(feed.map(\.id)).count, feed.count)
+        let cardOrder = feed.compactMap { item -> Int? in
+            if case .card(_, let index) = item { return index }
+            return nil
+        }
+        XCTAssertEqual(cardOrder, Array(0..<20))
+        // Same order all day, different tomorrow.
+        XCTAssertEqual(feed.map(\.id), Feed.items(filter: .all, quotes: QuoteLibrary.all, books: [book], day: today).map(\.id))
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        XCTAssertNotEqual(feed.map(\.id), Feed.items(filter: .all, quotes: QuoteLibrary.all, books: [book], day: tomorrow).map(\.id))
+        XCTAssertEqual(Feed.items(filter: .book("test"), quotes: QuoteLibrary.all, books: [book], day: today).count, 20)
+    }
+
     func testNextCyclePrefersQuotesNotJustSeen() throws {
         let now = Date()
         let first = try XCTUnwrap(Cycle.make(startHour: 8, now: now, ids: ids, previous: nil))

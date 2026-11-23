@@ -19,6 +19,23 @@ enum Theme {
             ? UIColor(red: 0.12, green: 0.12, blue: 0.13, alpha: 1)
             : UIColor.white
     })
+    /// Soft background tints for feed cards (pastel by day, muted by night).
+    private static let tints: [Color] = [
+        (UIColor(red: 0.965, green: 0.937, blue: 0.886, alpha: 1), UIColor(red: 0.17, green: 0.155, blue: 0.13, alpha: 1)),  // sand
+        (UIColor(red: 0.906, green: 0.937, blue: 0.906, alpha: 1), UIColor(red: 0.12, green: 0.16, blue: 0.135, alpha: 1)),  // sage
+        (UIColor(red: 0.906, green: 0.929, blue: 0.965, alpha: 1), UIColor(red: 0.115, green: 0.135, blue: 0.175, alpha: 1)), // mist
+        (UIColor(red: 0.965, green: 0.914, blue: 0.894, alpha: 1), UIColor(red: 0.18, green: 0.135, blue: 0.125, alpha: 1)), // clay
+        (UIColor(red: 0.929, green: 0.914, blue: 0.965, alpha: 1), UIColor(red: 0.145, green: 0.135, blue: 0.18, alpha: 1)),  // lavender
+    ].map { (pair: (UIColor, UIColor)) -> Color in
+        Color(uiColor: UIColor { traits in traits.userInterfaceStyle == .dark ? pair.1 : pair.0 })
+    }
+
+    /// A stable tint for an id (the same card always gets the same colour).
+    static func tint(for id: String) -> Color {
+        let sum = id.unicodeScalars.reduce(0) { ($0 &* 31 &+ Int($1.value)) & 0xFFFF }
+        return tints[sum % tints.count]
+    }
+
     /// The one accent: a muted sand gold.
     static let accent = Color(red: 0.71, green: 0.55, blue: 0.33)
 

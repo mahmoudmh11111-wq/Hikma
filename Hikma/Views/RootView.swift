@@ -9,7 +9,7 @@ struct RootView: View {
             if store.cycle == nil {
                 OnboardingView()
             } else {
-                HomeView()
+                MainTabView()
             }
         }
         .tint(Theme.ink)

@@ -154,7 +154,7 @@ struct BookCoverCard: View {
 struct BookCardView: View {
     let book: Book
     let index: Int
-    let date: Date
+    let date: Date?
 
     var body: some View {
         let card = book.cards[index]
@@ -205,10 +205,12 @@ struct BookCardView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Text(Arabic.dayAndTime(date))
-                .font(.system(size: 11))
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity)
+            if let date {
+                Text(Arabic.dayAndTime(date))
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity)
+            }
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
