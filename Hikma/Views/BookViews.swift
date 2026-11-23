@@ -270,9 +270,11 @@ struct LibraryView: View {
                         .listRowBackground(Color.clear)
                     }
                 } else {
-                    Section {
-                        ForEach(store.books) { book in
-                            NavigationLink(value: book.id) { row(book) }
+                    ForEach(store.topics, id: \.self) { topic in
+                        Section(topic) {
+                            ForEach(store.books.filter { $0.topicName == topic }) { book in
+                                NavigationLink(value: book.id) { row(book) }
+                            }
                         }
                     }
                 }
@@ -299,14 +301,19 @@ struct LibraryView: View {
                     Button("تم") { dismiss() }
                 }
             }
-            .fileImporter(isPresented: $importing, allowedContentTypes: [.hikmaBook, .json]) { result in
+            .fileImporter(isPresented: $importing, allowedContentTypes: [.hikmaBook, .json],
+                          allowsMultipleSelection: true) { result in
                 switch result {
-                case .success(let url):
-                    do {
-                        let book = try store.importBook(from: url)
-                        path = [book.id]
-                    } catch {
-                        store.importError = error.localizedDescription
+                case .success(let urls):
+                    var imported: [Book] = []
+                    var failed = 0
+                    for url in urls {
+                        if let book = try? store.importBook(from: url) { imported.append(book) } else { failed += 1 }
+                    }
+                    if imported.count == 1, failed == 0 { path = [imported[0].id] }
+                    store.justImportedBookID = nil
+                    if failed > 0 {
+                        store.importError = "تعذّر قراءة \(Arabic.number(failed)) من الملفات المختارة."
                     }
                 case .failure(let error):
                     store.importError = error.localizedDescription
@@ -329,7 +336,7 @@ struct LibraryView: View {
             Text(book.title)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(Theme.ink)
-            Text(book.author)
+            Text("\(book.author) · \(book.topicName)")
                 .font(.system(size: 13))
                 .foregroundStyle(.secondary)
             Text(progress.isActive

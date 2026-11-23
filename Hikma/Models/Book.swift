@@ -14,8 +14,12 @@ struct Book: Codable, Identifiable, Equatable {
     let originalTitle: String?
     let author: String
     let year: Int?
+    /// Topic for the feed filter, e.g. "الاقتصاد والتنمية". Older files without one go to "عام".
+    let topic: String?
     let about: String
     let cards: [BookCard]
+
+    var topicName: String { (topic?.isEmpty == false ? topic : nil) ?? "عام" }
 
     static func decode(_ data: Data) throws -> Book {
         let book = try JSONDecoder().decode(Book.self, from: data)

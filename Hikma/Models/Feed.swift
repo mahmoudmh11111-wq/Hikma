@@ -28,6 +28,7 @@ enum FeedFilter: Hashable {
     case all
     case sayings
     case book(String)   // book id
+    case topic(String)  // all books of a topic
 }
 
 enum Feed {
@@ -49,21 +50,28 @@ enum Feed {
         case .book(let id):
             // A single book reads in order, like the book itself.
             return books.first { $0.id == id }.map(bookItems) ?? []
+        case .topic(let name):
+            return spread(books.filter { $0.topicName == name }, into: [], rng: &rng, bookItems: bookItems)
         case .all:
-            // Sayings shuffled; each book's cards keep their order but are spread through the feed.
-            var result = sayings.shuffled(using: &rng)
-            for book in books {
-                let cards = bookItems(book)
-                guard !cards.isEmpty else { continue }
-                let total = result.count + cards.count
-                let step = Double(total) / Double(cards.count)
-                for (n, card) in cards.enumerated() {
-                    let position = min(result.count, Int(Double(n) * step + step / 2))
-                    result.insert(card, at: position)
-                }
-            }
-            return result
+            return spread(books, into: sayings.shuffled(using: &rng), rng: &rng, bookItems: bookItems)
         }
+    }
+
+    /// Each book's cards keep their order but are spread evenly through the feed.
+    private static func spread(_ books: [Book], into base: [FeedItem], rng: inout SeededGenerator,
+                               bookItems: (Book) -> [FeedItem]) -> [FeedItem] {
+        var result = base
+        for book in books.shuffled(using: &rng) {
+            let cards = bookItems(book)
+            guard !cards.isEmpty else { continue }
+            let total = result.count + cards.count
+            let step = Double(total) / Double(cards.count)
+            for (n, card) in cards.enumerated() {
+                let position = min(result.count, Int(Double(n) * step + step / 2))
+                result.insert(card, at: position)
+            }
+        }
+        return result
     }
 }
 

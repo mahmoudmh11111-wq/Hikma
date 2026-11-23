@@ -63,6 +63,12 @@ final class HikmaStore: ObservableObject {
         Feed.items(filter: filter, quotes: QuoteLibrary.all, books: books, day: now)
     }
 
+    /// Book topics, by number of books (most first).
+    var topics: [String] {
+        let counts = Dictionary(grouping: books, by: \.topicName).mapValues(\.count)
+        return counts.keys.sorted { (counts[$0] ?? 0, $1) > (counts[$1] ?? 0, $0) }
+    }
+
     func isSaved(_ item: FeedItem) -> Bool { savedIDs.contains(item.id) }
 
     func toggleSaved(_ item: FeedItem) {

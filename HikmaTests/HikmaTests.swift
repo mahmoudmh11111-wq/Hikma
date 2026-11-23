@@ -60,7 +60,7 @@ final class HikmaTests: XCTestCase {
     }
 
     private func sampleBook(cards: Int) -> Book {
-        Book(format: 1, id: "test", title: "كتاب", originalTitle: nil, author: "مؤلف", year: nil,
+        Book(format: 1, id: "test", title: "كتاب", originalTitle: nil, author: "مؤلف", year: nil, topic: "اختبار",
              about: "عن الكتاب",
              cards: (0..<cards).map { BookCard(id: "c\($0)", chapter: "الفصل", title: "عنوان \($0)",
                                                body: "نص", apply: nil) })
@@ -111,6 +111,8 @@ final class HikmaTests: XCTestCase {
         XCTAssertEqual(feed.map(\.id), Feed.items(filter: .all, quotes: QuoteLibrary.all, books: [book], day: today).map(\.id))
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
         XCTAssertNotEqual(feed.map(\.id), Feed.items(filter: .all, quotes: QuoteLibrary.all, books: [book], day: tomorrow).map(\.id))
+        XCTAssertEqual(Feed.items(filter: .topic("اختبار"), quotes: QuoteLibrary.all, books: [book], day: today).map(\.id),
+                       Feed.items(filter: .book("test"), quotes: QuoteLibrary.all, books: [book], day: today).map(\.id))
         XCTAssertEqual(Feed.items(filter: .book("test"), quotes: QuoteLibrary.all, books: [book], day: today).count, 20)
     }
 

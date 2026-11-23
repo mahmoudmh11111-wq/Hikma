@@ -69,6 +69,7 @@ struct FeedView: View {
         .onChange(of: filter) { _, _ in reload(resetPosition: true) }
         .onChange(of: store.books.map(\.id)) { _, _ in
             if case .book(let id) = filter, !store.books.contains(where: { $0.id == id }) { filter = .all }
+            if case .topic(let name) = filter, !store.topics.contains(name) { filter = .all }
             reload()
         }
         .sheet(item: $detail) { item in FeedDetailView(item: item) }
@@ -86,13 +87,43 @@ struct FeedView: View {
             HStack(spacing: 8) {
                 chip("الكل", .all)
                 chip("حِكَم", .sayings)
-                ForEach(store.books) { book in
+                ForEach(store.topics, id: \.self) { topic in
+                    chip(topic, .topic(topic))
+                }
+                if store.books.count > 1 {
+                    Menu {
+                        ForEach(store.topics, id: \.self) { topic in
+                            Section(topic) {
+                                ForEach(store.books.filter { $0.topicName == topic }) { book in
+                                    Button(book.title) { filter = .book(book.id) }
+                                }
+                            }
+                        }
+                    } label: {
+                        Label(bookChipTitle, systemImage: "book.closed")
+                            .font(.system(size: 13, weight: isBookFilter ? .semibold : .regular))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .background(isBookFilter ? Theme.ink : Theme.ink.opacity(0.06), in: Capsule())
+                            .foregroundStyle(isBookFilter ? Theme.paper : Theme.ink)
+                    }
+                } else if let book = store.books.first {
                     chip(book.title, .book(book.id))
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
+    }
+
+    private var isBookFilter: Bool {
+        if case .book = filter { return true }
+        return false
+    }
+
+    private var bookChipTitle: String {
+        if case .book(let id) = filter, let book = store.books.first(where: { $0.id == id }) { return book.title }
+        return "كتاب"
     }
 
     private func chip(_ title: String, _ value: FeedFilter) -> some View {
