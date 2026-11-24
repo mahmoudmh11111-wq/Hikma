@@ -4,11 +4,12 @@ import SwiftUI
 struct QuoteView: View {
     let quote: Quote
     var showsOriginal = false
+    @ScaledMetric(relativeTo: .largeTitle) private var quoteSize: CGFloat = 27
 
     var body: some View {
         VStack(spacing: 26) {
             Text(quote.text)
-                .font(Theme.quoteFont)
+                .font(.system(size: quoteSize, weight: .regular))
                 .lineSpacing(12)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Theme.ink)

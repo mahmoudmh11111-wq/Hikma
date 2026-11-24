@@ -36,6 +36,7 @@ struct MainTabView: View {
 /// One slot in the endless feed: the same idea can come round again on a later pass.
 private struct FeedEntry: Identifiable, Hashable {
     let pass: Int
+    let index: Int
     let item: FeedItem
     var id: String { "\(pass)|\(item.id)" }
 }
@@ -98,7 +99,7 @@ struct FeedView: View {
     private func reload(keepPosition: Bool = false) {
         base = store.feed(filter)
         passes = 1
-        entries = base.map { FeedEntry(pass: 0, item: $0) }
+        entries = base.enumerated().map { FeedEntry(pass: 0, index: $0, item: $1) }
         if !keepPosition || !entries.contains(where: { $0.id == position }) {
             position = entries.first?.id
         }
@@ -108,18 +109,18 @@ struct FeedView: View {
     private func reshuffle() {
         base = base.shuffled()
         passes = 1
-        entries = base.map { FeedEntry(pass: 0, item: $0) }
+        entries = base.enumerated().map { FeedEntry(pass: 0, index: $0, item: $1) }
         position = entries.first?.id
     }
 
     /// When a card a few from the end appears, quietly append another shuffled pass.
     private func extendIfNeeded(after entry: FeedEntry) {
-        guard base.count > 1, let index = entries.firstIndex(of: entry),
-              index >= entries.count - 4 else { return }
+        guard base.count > 1, entry.pass == passes - 1, entry.index >= base.count - 4 else { return }
         var next = base.shuffled()
         // Avoid the same idea twice in a row across the seam.
         if next.first == entries.last?.item, next.count > 1 { next.swapAt(0, 1) }
-        entries += next.map { FeedEntry(pass: passes, item: $0) }
+        let pass = passes
+        entries += next.enumerated().map { FeedEntry(pass: pass, index: $0, item: $1) }
         passes += 1
     }
 

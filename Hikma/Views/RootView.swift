@@ -223,6 +223,10 @@ struct TodayCardsView: View {
                     if originals.contains(slot) { originals.remove(slot) } else { originals.insert(slot) }
                 }
             }
+            .accessibilityAction(named: Text(originals.contains(slot) ? "إخفاء النص الأصلي" : "عرض النص الأصلي")) {
+                guard quote.original != nil else { return }
+                if originals.contains(slot) { originals.remove(slot) } else { originals.insert(slot) }
+            }
         }
     }
 
@@ -281,6 +285,12 @@ struct OnboardingView: View {
             }
             Spacer()
             SchedulePicker(startHour: $startHour)
+            Text("اسمح بالإشعارات لتصلك الحكم في مواعيدها. يمكنك تغيير ذلك لاحقًا من إعدادات الجهاز.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 8)
+                .padding(.top, 10)
             Spacer()
             Button {
                 starting = true

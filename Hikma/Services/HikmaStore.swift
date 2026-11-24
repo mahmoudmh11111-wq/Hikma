@@ -82,8 +82,10 @@ final class HikmaStore: ObservableObject {
 
     /// Saved items that still exist (a deleted book's cards drop out).
     var savedItems: [FeedItem] {
-        let all = Dictionary(feed(.all).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        return savedIDs.compactMap { all[$0] }
+        let items = QuoteLibrary.all.map(FeedItem.quote)
+            + books.flatMap { book in book.cards.indices.map { FeedItem.card(book: book, index: $0) } }
+        let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return savedIDs.compactMap { byID[$0] }
     }
 
     // MARK: - Books
@@ -244,7 +246,15 @@ final class HikmaStore: ObservableObject {
         BackgroundRefresh.schedule()
     }
 
-    func tick() { now = Date() }
+    /// Called every minute. Only publishes when something on screen would actually change
+    /// (a saying or card arrives, or the day turns), so open screens aren't redrawn for nothing.
+    func tick() {
+        let date = Date()
+        let changed = cycle?.latestDeliveredSlot(at: date) != latestSlot
+            || bookRun?.latestDelivered(at: date) != latestCard
+            || !Calendar.current.isDate(date, inSameDayAs: now)
+        if changed { now = date }
+    }
 
     func openFromNotification(slot: Int) {
         guard let cycle, cycle.order.indices.contains(slot) else { return }
