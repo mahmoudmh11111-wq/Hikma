@@ -61,7 +61,7 @@ final class HikmaTests: XCTestCase {
 
     private func sampleBook(cards: Int) -> Book {
         Book(format: 1, id: "test", title: "كتاب", originalTitle: nil, author: "مؤلف", year: nil, topic: "اختبار",
-             about: "عن الكتاب",
+             about: "عن الكتاب", language: nil,
              cards: (0..<cards).map { BookCard(id: "c\($0)", chapter: "الفصل", title: "عنوان \($0)",
                                                body: "نص", apply: nil) })
     }
