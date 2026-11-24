@@ -33,54 +33,109 @@ struct MainTabView: View {
 
 // MARK: - Feed
 
-/// A full-screen vertical feed of ideas: swipe up for the next one.
+/// One slot in the endless feed: the same idea can come round again on a later pass.
+private struct FeedEntry: Identifiable, Hashable {
+    let pass: Int
+    let item: FeedItem
+    var id: String { "\(pass)|\(item.id)" }
+}
+
+/// A continuous, free-scrolling feed of ideas. Cards show their full text,
+/// ease in and out at the edges, and the feed refills itself as you near the end.
 struct FeedView: View {
     @EnvironmentObject private var store: HikmaStore
     @State private var filter: FeedFilter = .all
-    @State private var items: [FeedItem] = []
+    @State private var base: [FeedItem] = []
+    @State private var entries: [FeedEntry] = []
+    @State private var passes = 0
     @State private var position: String?
     @State private var detail: FeedItem?
 
     var body: some View {
-        VStack(spacing: 0) {
-            filterBar
+        ScrollViewReader { proxy in
             ScrollView(.vertical) {
-                LazyVStack(spacing: 0) {
-                    ForEach(items) { item in
-                        FeedCard(item: item) { detail = item }
+                LazyVStack(spacing: 14) {
+                    Color.clear.frame(height: 0).id("top")
+                    ForEach(entries) { entry in
+                        FeedCard(item: entry.item) { detail = entry.item }
+                            .frame(maxWidth: 640)
                             .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .containerRelativeFrame([.horizontal, .vertical])
-                            .scrollTransition(axis: .vertical) { content, phase in
+                            .scrollTransition(.interactive, axis: .vertical) { content, phase in
                                 content
-                                    .scaleEffect(phase.isIdentity ? 1 : 0.93)
-                                    .opacity(phase.isIdentity ? 1 : 0.5)
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.965)
+                                    .opacity(phase.isIdentity ? 1 : 0.55)
                             }
-                            .id(item.id)
+                            .onAppear { extendIfNeeded(after: entry) }
+                            .id(entry.id)
+                    }
+                    if entries.isEmpty {
+                        emptyState
                     }
                 }
+                .padding(.vertical, 12)
                 .scrollTargetLayout()
             }
-            .scrollTargetBehavior(.paging)
             .scrollIndicators(.hidden)
-            .scrollPosition(id: $position)
+            .scrollPosition(id: $position, anchor: .top)
+            .refreshable { reshuffle() }
+            .safeAreaInset(edge: .top, spacing: 0) { filterBar }
+            .onChange(of: filter) { _, _ in
+                reload()
+                withAnimation(.smooth(duration: 0.35)) { proxy.scrollTo("top", anchor: .top) }
+            }
         }
-        .onAppear { if items.isEmpty { reload() } }
-        .onChange(of: filter) { _, _ in reload(resetPosition: true) }
+        .onAppear { if entries.isEmpty { reload() } }
         .onChange(of: store.books.map(\.id)) { _, _ in
             if case .book(let id) = filter, !store.books.contains(where: { $0.id == id }) { filter = .all }
             if case .topic(let name) = filter, !store.topics.contains(name) { filter = .all }
-            reload()
+            reload(keepPosition: true)
         }
         .sheet(item: $detail) { item in FeedDetailView(item: item) }
     }
 
-    private func reload(resetPosition: Bool = false) {
-        items = store.feed(filter)
-        if resetPosition || position == nil || !items.contains(where: { $0.id == position }) {
-            position = items.first?.id
+    // MARK: Endless feed
+
+    private func reload(keepPosition: Bool = false) {
+        base = store.feed(filter)
+        passes = 1
+        entries = base.map { FeedEntry(pass: 0, item: $0) }
+        if !keepPosition || !entries.contains(where: { $0.id == position }) {
+            position = entries.first?.id
         }
     }
+
+    /// Pull to refresh: a fresh order of the same ideas.
+    private func reshuffle() {
+        base = base.shuffled()
+        passes = 1
+        entries = base.map { FeedEntry(pass: 0, item: $0) }
+        position = entries.first?.id
+    }
+
+    /// When a card a few from the end appears, quietly append another shuffled pass.
+    private func extendIfNeeded(after entry: FeedEntry) {
+        guard base.count > 1, let index = entries.firstIndex(of: entry),
+              index >= entries.count - 4 else { return }
+        var next = base.shuffled()
+        // Avoid the same idea twice in a row across the seam.
+        if next.first == entries.last?.item, next.count > 1 { next.swapAt(0, 1) }
+        entries += next.map { FeedEntry(pass: passes, item: $0) }
+        passes += 1
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 28, weight: .ultraLight))
+                .foregroundStyle(Theme.accent)
+            Text("لا شيء هنا بعد")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+        }
+        .padding(.top, 120)
+    }
+
+    // MARK: Filters
 
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -102,8 +157,9 @@ struct FeedView: View {
                     } label: {
                         Label(bookChipTitle, systemImage: "book.closed")
                             .font(.system(size: 13, weight: isBookFilter ? .semibold : .regular))
+                            .lineLimit(1)
                             .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
+                            .padding(.vertical, 8)
                             .background(isBookFilter ? Theme.ink : Theme.ink.opacity(0.06), in: Capsule())
                             .foregroundStyle(isBookFilter ? Theme.paper : Theme.ink)
                     }
@@ -112,8 +168,10 @@ struct FeedView: View {
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.vertical, 10)
         }
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .bottom) { Divider().opacity(0.4) }
     }
 
     private var isBookFilter: Bool {
@@ -129,68 +187,68 @@ struct FeedView: View {
     private func chip(_ title: String, _ value: FeedFilter) -> some View {
         let isOn = filter == value
         return Button {
-            withAnimation(.easeInOut(duration: 0.2)) { filter = value }
+            withAnimation(.smooth(duration: 0.25)) { filter = value }
         } label: {
             Text(title)
                 .font(.system(size: 13, weight: isOn ? .semibold : .regular))
                 .lineLimit(1)
                 .padding(.horizontal, 14)
-                .padding(.vertical, 7)
+                .padding(.vertical, 8)
                 .background(isOn ? Theme.ink : Theme.ink.opacity(0.06), in: Capsule())
                 .foregroundStyle(isOn ? Theme.paper : Theme.ink)
         }
         .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: isOn)
     }
 }
 
-/// One full-screen idea card in the feed.
+/// One idea card in the feed, sized to its full content.
 struct FeedCard: View {
     @EnvironmentObject private var store: HikmaStore
     let item: FeedItem
     let onOpen: () -> Void
 
+    private let shape = RoundedRectangle(cornerRadius: 26, style: .continuous)
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 6) {
-                Image(systemName: kickerIcon)
-                    .font(.system(size: 11, weight: .semibold))
-                Text(kicker)
-                    .font(.system(size: 12, weight: .semibold))
-                    .lineLimit(1)
-            }
-            .foregroundStyle(Theme.accent)
-
-            Spacer(minLength: 20)
+        VStack(alignment: .leading, spacing: 18) {
+            header
             content
-            Spacer(minLength: 20)
-
-            HStack(alignment: .bottom) {
-                Text(footnote)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                Spacer(minLength: 16)
-                actions
-            }
+            footer
         }
-        .padding(26)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(Theme.tint(for: item.id), in: RoundedRectangle(cornerRadius: 32, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+        .padding(.horizontal, 22)
+        .padding(.top, 20)
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.tint(for: item.id), in: shape)
+        .overlay(shape.strokeBorder(Theme.ink.opacity(0.06), lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.05), radius: 14, y: 6)
+        .contentShape(shape)
         .onTapGesture(perform: onOpen)
+    }
+
+    private var header: some View {
+        HStack(spacing: 6) {
+            Image(systemName: kickerIcon)
+                .font(.system(size: 11, weight: .semibold))
+            Text(kicker)
+                .font(.system(size: 12, weight: .semibold))
+                .lineLimit(1)
+        }
+        .foregroundStyle(Theme.accent)
     }
 
     @ViewBuilder private var content: some View {
         switch item {
         case .quote(let quote):
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 16) {
                 Text(quote.text)
-                    .font(.system(size: 27, weight: .regular))
-                    .lineSpacing(11)
+                    .font(.system(size: 24, weight: .regular, design: .serif))
+                    .lineSpacing(10)
                     .foregroundStyle(Theme.ink)
-                    .minimumScaleFactor(0.7)
+                    .fixedSize(horizontal: false, vertical: true)
                 Capsule().fill(Theme.accent).frame(width: 28, height: 2)
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(quote.sayer)
                         .font(Theme.sayerFont)
                         .foregroundStyle(Theme.ink)
@@ -201,49 +259,57 @@ struct FeedCard: View {
             }
         case .card(let book, let index):
             let card = book.cards[index]
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text(card.title)
-                    .font(.system(size: 24, weight: .bold))
+                    .font(.system(size: 22, weight: .bold, design: .serif))
                     .foregroundStyle(Theme.ink)
-                    .minimumScaleFactor(0.8)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(card.body)
-                    .font(.system(size: 16))
-                    .lineSpacing(7)
+                    .font(.system(size: 16.5))
+                    .lineSpacing(6)
                     .foregroundStyle(Theme.ink.opacity(0.88))
-                    .lineLimit(11)
-                    .minimumScaleFactor(0.85)
+                    .fixedSize(horizontal: false, vertical: true)
                 if let apply = card.apply, !apply.isEmpty {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(book.applyLabel)
+                    VStack(alignment: .leading, spacing: 5) {
+                        Label(book.applyLabel, systemImage: "arrow.turn.down.right")
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(Theme.accent)
                         Text(apply)
-                            .font(.system(size: 14, weight: .medium))
+                            .font(.system(size: 15, weight: .medium))
                             .lineSpacing(4)
                             .foregroundStyle(Theme.ink)
-                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(.top, 2)
+                    .padding(14)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.paper.opacity(0.6), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .padding(.top, 4)
                 }
             }
             .environment(\.layoutDirection, book.direction)
         }
     }
 
-    private var actions: some View {
-        HStack(spacing: 4) {
+    private var footer: some View {
+        HStack(alignment: .center) {
+            Text(footnote)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Spacer(minLength: 12)
             Button {
                 withAnimation(.spring(duration: 0.3)) { store.toggleSaved(item) }
             } label: {
                 Image(systemName: store.isSaved(item) ? "bookmark.fill" : "bookmark")
-                    .font(.system(size: 19, weight: .light))
+                    .font(.system(size: 18, weight: .light))
                     .foregroundStyle(store.isSaved(item) ? Theme.accent : Theme.ink)
                     .frame(width: 44, height: 44)
                     .contentTransition(.symbolEffect(.replace))
             }
+            .sensoryFeedback(.impact(weight: .light), trigger: store.isSaved(item))
             ShareLink(item: item.shareText) {
                 Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 18, weight: .light))
+                    .font(.system(size: 17, weight: .light))
                     .foregroundStyle(Theme.ink)
                     .frame(width: 44, height: 44)
             }
@@ -267,8 +333,10 @@ struct FeedCard: View {
 
     private var footnote: String {
         switch item {
-        case .quote: return "اضغط للتفاصيل"
-        case .card(let book, let index): return "\(book.cards[index].chapter) · \(Arabic.number(index + 1))/\(Arabic.number(book.cards.count))"
+        case .quote: return "حكمة"
+        case .card(let book, let index):
+            let n = book.isEnglish ? "\(index + 1)/\(book.cards.count)" : "\(Arabic.number(index + 1))/\(Arabic.number(book.cards.count))"
+            return "\(book.cards[index].chapter) · \(n)"
         }
     }
 }
