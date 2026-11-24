@@ -51,6 +51,7 @@ struct FeedView: View {
     @State private var passes = 0
     @State private var position: String?
     @State private var detail: FeedItem?
+    @State private var openBook: Book?
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -58,7 +59,7 @@ struct FeedView: View {
                 LazyVStack(spacing: 14) {
                     Color.clear.frame(height: 0).id("top")
                     ForEach(entries) { entry in
-                        FeedCard(item: entry.item) { detail = entry.item }
+                        FeedCard(item: entry.item, onOpen: { detail = entry.item }, onOpenBook: { openBook = $0 })
                             .frame(maxWidth: 640)
                             .padding(.horizontal, 16)
                             .scrollTransition(.interactive, axis: .vertical) { content, phase in
@@ -92,6 +93,7 @@ struct FeedView: View {
             reload(keepPosition: true)
         }
         .sheet(item: $detail) { item in FeedDetailView(item: item) }
+        .sheet(item: $openBook) { book in BookAllCardsView(book: book) }
     }
 
     // MARK: Endless feed
@@ -204,12 +206,20 @@ struct FeedView: View {
 }
 
 /// One idea card in the feed, sized to its full content.
+/// Long-press any word in the text for Look Up and Translate.
 struct FeedCard: View {
     @EnvironmentObject private var store: HikmaStore
     let item: FeedItem
-    let onOpen: () -> Void
+    var onOpen: (() -> Void)? = nil
+    /// Tapping the book's name opens all its cards. Nil inside the book list itself.
+    var onOpenBook: ((Book) -> Void)? = nil
 
     private let shape = RoundedRectangle(cornerRadius: 26, style: .continuous)
+
+    private var isRead: Bool {
+        if case .card = item { return store.isRead(item) }
+        return false
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -221,33 +231,55 @@ struct FeedCard: View {
         .padding(.top, 20)
         .padding(.bottom, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.tint(for: item.id), in: shape)
-        .overlay(shape.strokeBorder(Theme.ink.opacity(0.06), lineWidth: 0.5))
-        .shadow(color: .black.opacity(0.05), radius: 14, y: 6)
+        .background {
+            ZStack {
+                Theme.tint(for: item.id)
+                if isRead { Theme.paper.opacity(0.6) }
+            }
+            .clipShape(shape)
+        }
+        .overlay(shape.strokeBorder(Theme.ink.opacity(isRead ? 0.04 : 0.06), lineWidth: 0.5))
+        .shadow(color: .black.opacity(isRead ? 0.02 : 0.05), radius: 14, y: 6)
+        .animation(.easeInOut(duration: 0.25), value: isRead)
         .contentShape(shape)
-        .onTapGesture(perform: onOpen)
+        .onTapGesture { onOpen?() }
     }
 
-    private var header: some View {
-        HStack(spacing: 6) {
-            Image(systemName: kickerIcon)
-                .font(.system(size: 11, weight: .semibold))
-            Text(kicker)
-                .font(.system(size: 12, weight: .semibold))
-                .lineLimit(1)
+    @ViewBuilder private var header: some View {
+        if case .card(let book, _) = item, let onOpenBook {
+            Button { onOpenBook(book) } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "book.closed")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text(book.title)
+                        .font(.system(size: 12, weight: .semibold))
+                        .lineLimit(1)
+                    Image(systemName: book.isEnglish ? "chevron.right" : "chevron.left")
+                        .font(.system(size: 9, weight: .bold))
+                }
+                .foregroundStyle(Theme.accent)
+                .padding(.vertical, 6)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(book.isEnglish ? "Show all cards in this book" : "عرض جميع بطاقات الكتاب")
+        } else {
+            HStack(spacing: 6) {
+                Image(systemName: kickerIcon)
+                    .font(.system(size: 11, weight: .semibold))
+                Text(kicker)
+                    .font(.system(size: 12, weight: .semibold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(Theme.accent)
         }
-        .foregroundStyle(Theme.accent)
     }
 
     @ViewBuilder private var content: some View {
         switch item {
         case .quote(let quote):
             VStack(alignment: .leading, spacing: 16) {
-                Text(quote.text)
-                    .font(.system(size: 24, weight: .regular, design: .serif))
-                    .lineSpacing(10)
-                    .foregroundStyle(Theme.ink)
-                    .fixedSize(horizontal: false, vertical: true)
+                SelectableText(text: quote.text, size: 24, serif: true, lineSpacing: 10)
                 Capsule().fill(Theme.accent).frame(width: 28, height: 2)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(quote.sayer)
@@ -263,23 +295,17 @@ struct FeedCard: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(card.title)
                     .font(.system(size: 22, weight: .bold, design: .serif))
-                    .foregroundStyle(Theme.ink)
+                    .foregroundStyle(Theme.ink.opacity(isRead ? 0.7 : 1))
                     .fixedSize(horizontal: false, vertical: true)
-                Text(card.body)
-                    .font(.system(size: 16.5))
-                    .lineSpacing(6)
-                    .foregroundStyle(Theme.ink.opacity(0.88))
-                    .fixedSize(horizontal: false, vertical: true)
+                SelectableText(text: card.body, size: 16.5, lineSpacing: 6,
+                               color: Theme.inkUI(alpha: isRead ? 0.62 : 0.88))
                 if let apply = card.apply, !apply.isEmpty {
                     VStack(alignment: .leading, spacing: 5) {
                         Label(book.applyLabel, systemImage: "arrow.turn.down.right")
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(Theme.accent)
-                        Text(apply)
-                            .font(.system(size: 15, weight: .medium))
-                            .lineSpacing(4)
-                            .foregroundStyle(Theme.ink)
-                            .fixedSize(horizontal: false, vertical: true)
+                        SelectableText(text: apply, size: 15, weight: .medium, lineSpacing: 4,
+                                       color: Theme.inkUI(alpha: isRead ? 0.7 : 1))
                     }
                     .padding(14)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -292,12 +318,23 @@ struct FeedCard: View {
     }
 
     private var footer: some View {
-        HStack(alignment: .center) {
-            Text(footnote)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+        HStack(alignment: .center, spacing: 0) {
+            if case .card(let book, _) = item {
+                ReadTick(item: item, english: book.isEnglish)
+            } else {
+                Text(footnote)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
             Spacer(minLength: 12)
+            if case .card = item {
+                Text(footnote)
+                    .font(.system(size: 11))
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .padding(.horizontal, 4)
+            }
             Button {
                 withAnimation(.spring(duration: 0.3)) { store.toggleSaved(item) }
             } label: {
@@ -336,9 +373,37 @@ struct FeedCard: View {
         switch item {
         case .quote: return "حكمة"
         case .card(let book, let index):
-            let n = book.isEnglish ? "\(index + 1)/\(book.cards.count)" : "\(Arabic.number(index + 1))/\(Arabic.number(book.cards.count))"
-            return "\(book.cards[index].chapter) · \(n)"
+            return book.isEnglish ? "\(index + 1)/\(book.cards.count)"
+                                  : "\(Arabic.number(index + 1))/\(Arabic.number(book.cards.count))"
         }
+    }
+}
+
+/// The small "mark as read" tick under a book card.
+struct ReadTick: View {
+    @EnvironmentObject private var store: HikmaStore
+    let item: FeedItem
+    let english: Bool
+
+    var body: some View {
+        let read = store.isRead(item)
+        Button {
+            withAnimation(.easeInOut(duration: 0.25)) { store.toggleRead(item) }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: read ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 18, weight: .light))
+                    .contentTransition(.symbolEffect(.replace))
+                Text(read ? (english ? "Read" : "مقروءة") : (english ? "Mark as read" : "علّمها مقروءة"))
+                    .font(.system(size: 12, weight: .medium))
+            }
+            .foregroundStyle(read ? Theme.accent : Theme.ink.opacity(0.55))
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .sensoryFeedback(.success, trigger: read)
+        .accessibilityLabel(read ? (english ? "Marked as read" : "مقروءة") : (english ? "Mark as read" : "علّمها مقروءة"))
     }
 }
 

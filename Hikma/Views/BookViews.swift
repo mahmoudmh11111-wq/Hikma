@@ -152,6 +152,7 @@ struct BookCoverCard: View {
 }
 
 struct BookCardView: View {
+    @EnvironmentObject private var store: HikmaStore
     let book: Book
     let index: Int
     let date: Date?
@@ -179,21 +180,15 @@ struct BookCardView: View {
                         .font(.system(size: 23, weight: .bold))
                         .foregroundStyle(Theme.ink)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text(card.body)
-                        .font(.system(size: 17))
-                        .lineSpacing(9)
-                        .foregroundStyle(Theme.ink.opacity(0.88))
-                        .fixedSize(horizontal: false, vertical: true)
+                    SelectableText(text: card.body, size: 17, lineSpacing: 9,
+                                   color: Theme.inkUI(alpha: isRead ? 0.62 : 0.88))
                     if let apply = card.apply, !apply.isEmpty {
                         VStack(alignment: .leading, spacing: 6) {
                             Text(book.applyLabel)
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundStyle(Theme.accent)
-                            Text(apply)
-                                .font(.system(size: 15, weight: .medium))
-                                .lineSpacing(6)
-                                .foregroundStyle(Theme.ink)
-                                .fixedSize(horizontal: false, vertical: true)
+                            SelectableText(text: apply, size: 15, weight: .medium, lineSpacing: 6,
+                                           color: Theme.inkUI(alpha: isRead ? 0.7 : 1))
                         }
                         .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -205,18 +200,30 @@ struct BookCardView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            if let date {
-                Text(Arabic.dayAndTime(date))
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
-                    .frame(maxWidth: .infinity)
+            HStack {
+                ReadTick(item: item, english: book.isEnglish)
+                Spacer()
+                if let date {
+                    Text(Arabic.dayAndTime(date))
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                }
             }
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .cardBackground()
+        .overlay {
+            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                .fill(Theme.paper.opacity(isRead ? 0.45 : 0))
+                .allowsHitTesting(false)
+        }
+        .animation(.easeInOut(duration: 0.25), value: isRead)
         .environment(\.layoutDirection, book.direction)
     }
+
+    private var item: FeedItem { .card(book: book, index: index) }
+    private var isRead: Bool { store.isRead(item) }
 }
 
 extension View {
@@ -439,5 +446,68 @@ struct BookDetailView: View {
         BookRun.dailyHours(sayingsStartHour: store.startHour, perDay: perDay)
             .map { Arabic.hour($0) }
             .joined(separator: " · ")
+    }
+}
+
+// MARK: - All cards of one book
+
+/// Every card of one book in one continuous scroll, opened by tapping the book's name on a card.
+/// Opens at the first card you haven't ticked as read.
+struct BookAllCardsView: View {
+    @EnvironmentObject private var store: HikmaStore
+    @Environment(\.dismiss) private var dismiss
+    let book: Book
+
+    var body: some View {
+        NavigationStack {
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 14) {
+                        ForEach(book.cards.indices, id: \.self) { index in
+                            if index == 0 || book.cards[index].chapter != book.cards[index - 1].chapter {
+                                Text(book.cards[index].chapter)
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(Theme.accent)
+                                    .padding(.horizontal, 24)
+                                    .padding(.top, index == 0 ? 4 : 14)
+                            }
+                            FeedCard(item: .card(book: book, index: index))
+                                .frame(maxWidth: 640)
+                                .padding(.horizontal, 16)
+                                .frame(maxWidth: .infinity)
+                                .id(index)
+                        }
+                    }
+                    .padding(.vertical, 12)
+                }
+                .scrollIndicators(.hidden)
+                .background(Theme.paper)
+                .onAppear {
+                    let firstUnread = book.cards.indices.first { !store.isRead(.card(book: book, index: $0)) }
+                    if let firstUnread, firstUnread > 0 {
+                        DispatchQueue.main.async { proxy.scrollTo(firstUnread, anchor: .top) }
+                    }
+                }
+            }
+            .navigationTitle(book.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(book.isEnglish ? "Done" : "تم") { dismiss() }
+                }
+                ToolbarItem(placement: .cancellationAction) {
+                    Text(progress)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .environment(\.layoutDirection, book.direction)
+        .tint(Theme.ink)
+    }
+
+    private var progress: String {
+        let read = store.readCount(book), total = book.cards.count
+        return book.isEnglish ? "\(read)/\(total) read" : "\(Arabic.number(read))/\(Arabic.number(total)) مقروءة"
     }
 }

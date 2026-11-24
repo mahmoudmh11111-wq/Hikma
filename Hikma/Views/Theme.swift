@@ -8,11 +8,17 @@ enum Theme {
             ? UIColor(red: 0.07, green: 0.07, blue: 0.075, alpha: 1)
             : UIColor(red: 0.98, green: 0.973, blue: 0.957, alpha: 1)
     })
-    static let ink = Color(uiColor: UIColor { traits in
+    static let inkUIColor = UIColor { traits in
         traits.userInterfaceStyle == .dark
             ? UIColor(white: 0.93, alpha: 1)
             : UIColor(red: 0.11, green: 0.11, blue: 0.12, alpha: 1)
-    })
+    }
+    static let ink = Color(uiColor: inkUIColor)
+
+    /// Ink at a given strength that still follows light and dark mode.
+    static func inkUI(alpha: CGFloat) -> UIColor {
+        UIColor { inkUIColor.resolvedColor(with: $0).withAlphaComponent(alpha) }
+    }
     /// Cards sit slightly lifted off the paper.
     static let card = Color(uiColor: UIColor { traits in
         traits.userInterfaceStyle == .dark

@@ -29,6 +29,8 @@ final class HikmaStore: ObservableObject {
     @Published var importError: String?
     /// Ideas saved from the feed (FeedItem ids), newest first.
     @Published private(set) var savedIDs: [String] = []
+    /// Book cards the reader ticked as read.
+    @Published private(set) var readIDs: Set<String> = []
 
     private enum Keys {
         static let cycle = "hikma.cycle"
@@ -36,6 +38,7 @@ final class HikmaStore: ObservableObject {
         static let sayingsEnabled = "hikma.sayingsEnabled"
         static let bookRun = "hikma.bookRun"
         static let saved = "hikma.saved"
+        static let read = "hikma.read"
     }
 
     private init() {
@@ -49,6 +52,7 @@ final class HikmaStore: ObservableObject {
             sayingsEnabled = defaults.bool(forKey: Keys.sayingsEnabled)
         }
         savedIDs = defaults.stringArray(forKey: Keys.saved) ?? []
+        readIDs = Set(defaults.stringArray(forKey: Keys.read) ?? [])
         books = BookShelf.loadAll()
         if let data = defaults.data(forKey: Keys.bookRun),
            let run = try? JSONDecoder().decode(BookRun.self, from: data),
@@ -78,6 +82,18 @@ final class HikmaStore: ObservableObject {
             savedIDs.insert(item.id, at: 0)
         }
         UserDefaults.standard.set(savedIDs, forKey: Keys.saved)
+    }
+
+    func isRead(_ item: FeedItem) -> Bool { readIDs.contains(item.id) }
+
+    func toggleRead(_ item: FeedItem) {
+        if readIDs.contains(item.id) { readIDs.remove(item.id) } else { readIDs.insert(item.id) }
+        UserDefaults.standard.set(Array(readIDs), forKey: Keys.read)
+    }
+
+    /// How many of a book's cards are ticked as read.
+    func readCount(_ book: Book) -> Int {
+        book.cards.indices.filter { readIDs.contains(FeedItem.card(book: book, index: $0).id) }.count
     }
 
     /// Saved items that still exist (a deleted book's cards drop out).
