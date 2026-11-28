@@ -271,8 +271,6 @@ enum ArticleTemplate {
     @media (prefers-color-scheme: dark) {
       :root { --paper: #121213; --card: #1F1F21; --ink: #EDEDED; --soft: rgba(237,237,237,.74);
               --faint: rgba(237,237,237,.10); --accent: #C9A06A; --accent-soft: rgba(201,160,106,.16); }
-      svg .ink { stroke: #EDEDED; fill: none; } svg .ink-fill { fill: #EDEDED; } svg text { fill: #EDEDED; }
-      svg .paper-fill { fill: #1F1F21; }
     }
     * { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
@@ -305,7 +303,10 @@ enum ArticleTemplate {
     figure { margin: 26px 0; background: var(--card); border: 1px solid var(--faint); border-radius: 16px; padding: 14px; }
     figure svg, figure img { display: block; width: 100%; height: auto; }
     figcaption { color: var(--soft); font-size: 13.5px; line-height: 1.5; margin-top: 10px; }
-    svg text { font-family: -apple-system, sans-serif; fill: #1C1C1F; }
+    figure svg { color: var(--ink); }
+    svg text { font-family: -apple-system, sans-serif; fill: currentColor; }
+    svg .accent { fill: var(--accent); } svg .accent-stroke { stroke: var(--accent); }
+    svg .soft { fill: var(--accent-soft); } svg .card { fill: var(--card); } svg .muted { fill: var(--soft); }
     .analysis { margin-top: 46px; padding: 22px 20px; border-radius: 20px; background: var(--accent-soft); }
     .analysis h2 { margin-top: 0; }
     .analysis-label { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
