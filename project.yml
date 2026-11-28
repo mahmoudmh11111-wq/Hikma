@@ -57,6 +57,11 @@ targets:
             LSHandlerRank: Owner
             LSItemContentTypes:
               - com.hikma.book
+          - CFBundleTypeName: Hikma Article
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Owner
+            LSItemContentTypes:
+              - com.hikma.article
         UTExportedTypeDeclarations:
           - UTTypeIdentifier: com.hikma.book
             UTTypeDescription: Hikma Book
@@ -68,6 +73,16 @@ targets:
                 - hikmabook
               public.mime-type:
                 - application/x-hikma-book
+          - UTTypeIdentifier: com.hikma.article
+            UTTypeDescription: Hikma Article
+            UTTypeConformsTo:
+              - public.json
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - hikmaarticle
+              public.mime-type:
+                - application/x-hikma-article
   HikmaTests:
     type: bundle.unit-test
     platform: iOS

@@ -20,8 +20,8 @@ struct HikmaApp: App {
                     if let card = note.object as? Int { store.openFromNotification(card: card) }
                 }
                 .onOpenURL { url in
-                    // A .hikmabook file opened with Hikma (Files, AirDrop, Mail, WhatsApp…).
-                    do { try store.importBook(from: url) } catch { store.importError = error.localizedDescription }
+                    // A .hikmabook or .hikmaarticle file opened with Hikma (Files, AirDrop, Mail, WhatsApp…).
+                    do { try store.importFile(from: url) } catch { store.importError = error.localizedDescription }
                 }
         }
         .onChange(of: scenePhase) { _, phase in

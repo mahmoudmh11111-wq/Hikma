@@ -31,6 +31,9 @@ final class HikmaStore: ObservableObject {
     @Published private(set) var savedIDs: [String] = []
     /// Book cards the reader ticked as read.
     @Published private(set) var readIDs: Set<String> = []
+    /// Imported chapter articles, grouped by book in the Articles tab.
+    @Published private(set) var articles: [Article] = []
+    @Published var justImportedArticleID: String?
 
     private enum Keys {
         static let cycle = "hikma.cycle"
@@ -53,6 +56,7 @@ final class HikmaStore: ObservableObject {
         }
         savedIDs = defaults.stringArray(forKey: Keys.saved) ?? []
         readIDs = Set(defaults.stringArray(forKey: Keys.read) ?? [])
+        articles = ArticleShelf.loadAll()
         books = BookShelf.loadAll()
         if let data = defaults.data(forKey: Keys.bookRun),
            let run = try? JSONDecoder().decode(BookRun.self, from: data),
@@ -127,6 +131,44 @@ final class HikmaStore: ObservableObject {
     func progress(of book: Book) -> (delivered: Int, total: Int, isActive: Bool) {
         guard let run = bookRun, run.bookID == book.id else { return (0, book.cards.count, false) }
         return ((latestCard ?? -1) + 1, run.count, true)
+    }
+
+    /// Imports any Hikma file: a chapter article (`.hikmaarticle`) or a book (`.hikmabook`).
+    func importFile(from url: URL) throws {
+        if url.pathExtension.lowercased() == "hikmaarticle" {
+            try importArticle(from: url)
+        } else {
+            try importBook(from: url)
+        }
+    }
+
+    /// Imports a `.hikmaarticle` file. An article with the same id replaces the older copy.
+    @discardableResult
+    func importArticle(from url: URL) throws -> Article {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        let data = try Data(contentsOf: url)
+        let article = try Article.decode(data)
+        try ArticleShelf.save(data, id: article.id)
+        articles.removeAll { $0.id == article.id }
+        articles.append(article)
+        articles.sort { ($0.book, $0.chapter) < ($1.book, $1.chapter) }
+        justImportedArticleID = article.id
+        return article
+    }
+
+    func deleteArticle(_ article: Article) {
+        ArticleShelf.delete(id: article.id)
+        articles.removeAll { $0.id == article.id }
+        UserDefaults.standard.removeObject(forKey: "hikma.articleOffset." + article.id)
+    }
+
+    func isRead(_ article: Article) -> Bool { readIDs.contains("article|" + article.id) }
+
+    func toggleRead(_ article: Article) {
+        let key = "article|" + article.id
+        if readIDs.contains(key) { readIDs.remove(key) } else { readIDs.insert(key) }
+        UserDefaults.standard.set(Array(readIDs), forKey: Keys.read)
     }
 
     /// Imports a `.hikmabook` file (from Files, AirDrop, Mail or a chat app).

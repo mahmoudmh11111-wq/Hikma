@@ -310,14 +310,16 @@ struct LibraryView: View {
                     Button("تم") { dismiss() }
                 }
             }
-            .fileImporter(isPresented: $importing, allowedContentTypes: [.hikmaBook, .json],
+            .fileImporter(isPresented: $importing, allowedContentTypes: [.hikmaBook, .hikmaArticle, .json],
                           allowsMultipleSelection: true) { result in
                 switch result {
                 case .success(let urls):
                     var imported: [Book] = []
                     var failed = 0
                     for url in urls {
-                        if let book = try? store.importBook(from: url) { imported.append(book) } else { failed += 1 }
+                        if url.pathExtension.lowercased() == "hikmaarticle" {
+                            if (try? store.importArticle(from: url)) == nil { failed += 1 }
+                        } else if let book = try? store.importBook(from: url) { imported.append(book) } else { failed += 1 }
                     }
                     if imported.count == 1, failed == 0 { path = [imported[0].id] }
                     store.justImportedBookID = nil

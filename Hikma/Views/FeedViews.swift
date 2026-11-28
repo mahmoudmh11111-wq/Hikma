@@ -21,6 +21,10 @@ struct MainTabView: View {
                 .background(Theme.paper.ignoresSafeArea())
                 .tabItem { Label("المحفوظات", systemImage: "bookmark") }
                 .tag(2)
+            ArticlesView()
+                .background(Theme.paper.ignoresSafeArea())
+                .tabItem { Label("مقالات", systemImage: "doc.richtext") }
+                .tag(3)
         }
         .toolbarBackground(Theme.paper, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
@@ -28,6 +32,7 @@ struct MainTabView: View {
         .onChange(of: store.focusedSlot) { _, slot in if slot != nil { tab = 1 } }
         .onChange(of: store.focusedCard) { _, card in if card != nil { tab = 1 } }
         .onChange(of: store.justImportedBookID) { _, id in if id != nil { tab = 1 } }
+        .onChange(of: store.justImportedArticleID) { _, id in if id != nil { tab = 3 } }
     }
 }
 
