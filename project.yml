@@ -46,6 +46,7 @@ targets:
         # Lets iOS wake the app now and then to top up the notification queue.
         UIBackgroundModes:
           - fetch
+          - audio
         BGTaskSchedulerPermittedIdentifiers:
           - com.hikma.app.refresh
         ITSAppUsesNonExemptEncryption: false

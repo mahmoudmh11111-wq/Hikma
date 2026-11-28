@@ -134,11 +134,21 @@ struct ArticleReaderView: View {
     @EnvironmentObject private var store: HikmaStore
     @Environment(\.dismiss) private var dismiss
     let article: Article
+    @StateObject private var speaker: ArticleSpeaker
+
+    init(article: Article) {
+        self.article = article
+        _speaker = StateObject(wrappedValue: ArticleSpeaker(english: article.isEnglish, title: article.title))
+    }
 
     var body: some View {
         NavigationStack {
-            ArticleWebView(article: article)
+            ArticleWebView(article: article, speaker: speaker)
                 .ignoresSafeArea(edges: .bottom)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    ReadAloudBar(speaker: speaker, english: article.isEnglish)
+                }
+                .onDisappear { speaker.stop() }
                 .background(Theme.paper)
                 .navigationTitle(article.book)
                 .navigationBarTitleDisplayMode(.inline)
@@ -164,12 +174,83 @@ struct ArticleReaderView: View {
     }
 }
 
+/// Read-aloud controls: previous paragraph, play/pause, next paragraph, and speed.
+struct ReadAloudBar: View {
+    @ObservedObject var speaker: ArticleSpeaker
+    let english: Bool
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Button { speaker.skip(-1) } label: {
+                Image(systemName: english ? "backward.fill" : "forward.fill").font(.system(size: 15))
+                    .frame(width: 44, height: 44)
+            }
+            .disabled(!speaker.isActive)
+            .accessibilityLabel(english ? "Previous paragraph" : "الفقرة السابقة")
+
+            Button { speaker.togglePlay() } label: {
+                Image(systemName: speaker.isPlaying ? "pause.fill" : "play.fill")
+                    .font(.system(size: 19, weight: .semibold))
+                    .foregroundStyle(Theme.paper)
+                    .frame(width: 48, height: 48)
+                    .background(Theme.ink, in: Circle())
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .disabled(!speaker.isReady)
+            .accessibilityLabel(speaker.isPlaying ? (english ? "Pause" : "إيقاف مؤقت")
+                                                  : (english ? "Read aloud" : "اقرأ لي"))
+
+            Button { speaker.skip(1) } label: {
+                Image(systemName: english ? "forward.fill" : "backward.fill").font(.system(size: 15))
+                    .frame(width: 44, height: 44)
+            }
+            .disabled(!speaker.isActive)
+            .accessibilityLabel(english ? "Next paragraph" : "الفقرة التالية")
+
+            Spacer(minLength: 8)
+
+            Menu {
+                Picker(english ? "Reading speed" : "سرعة القراءة", selection: $speaker.speed) {
+                    ForEach(ArticleSpeaker.Speed.allCases, id: \.self) { speed in
+                        Label(speed.label(english: english), systemImage: speed.symbol).tag(speed)
+                    }
+                }
+            } label: {
+                Label(speaker.speed.label(english: english), systemImage: speaker.speed.symbol)
+                    .font(.system(size: 13, weight: .semibold))
+                    .padding(.horizontal, 12)
+                    .frame(height: 34)
+                    .background(Theme.ink.opacity(0.07), in: Capsule())
+            }
+            .accessibilityLabel(english ? "Reading speed" : "سرعة القراءة")
+
+            if speaker.isActive {
+                Button { speaker.stop() } label: {
+                    Image(systemName: "stop.fill").font(.system(size: 13))
+                        .frame(width: 38, height: 38)
+                }
+                .accessibilityLabel(english ? "Stop reading" : "إيقاف القراءة")
+                .transition(.opacity)
+            }
+        }
+        .foregroundStyle(Theme.ink)
+        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) { Divider().opacity(0.5) }
+        .environment(\.layoutDirection, english ? .leftToRight : .rightToLeft)
+        .animation(.easeInOut(duration: 0.2), value: speaker.isActive)
+    }
+}
+
 /// The article text in a web view: native selection with Look Up and Translate,
 /// tables and inline SVG figures, light and dark mode, and a remembered scroll position.
 struct ArticleWebView: UIViewRepresentable {
     let article: Article
+    var speaker: ArticleSpeaker? = nil
 
-    func makeCoordinator() -> Coordinator { Coordinator(articleID: article.id) }
+    func makeCoordinator() -> Coordinator { Coordinator(articleID: article.id, speaker: speaker) }
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -192,9 +273,14 @@ struct ArticleWebView: UIViewRepresentable {
 
     final class Coordinator: NSObject, WKNavigationDelegate, UIScrollViewDelegate {
         let key: String
-        init(articleID: String) { key = "hikma.articleOffset." + articleID }
+        weak var speaker: ArticleSpeaker?
+        init(articleID: String, speaker: ArticleSpeaker?) {
+            key = "hikma.articleOffset." + articleID
+            self.speaker = speaker
+        }
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            speaker?.attach(webView)
             let fraction = UserDefaults.standard.double(forKey: key)
             guard fraction > 0 else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
@@ -276,7 +362,7 @@ enum ArticleTemplate {
     html { -webkit-text-size-adjust: 100%; }
     body { margin: 0; background: var(--paper); color: var(--ink);
            font: -apple-system-body; font-size: 17.5px; line-height: 1.72;
-           padding: 8px 22px 80px; -webkit-hyphens: auto; }
+           padding: 8px 22px 120px; -webkit-hyphens: auto; }
     article, .masthead { max-width: 680px; margin: 0 auto; }
     .masthead { padding: 18px 0 8px; border-bottom: 1px solid var(--faint); margin-bottom: 22px; }
     .kicker { color: var(--accent); font-size: 12.5px; font-weight: 600; letter-spacing: .02em; margin: 0 0 8px; }
@@ -310,6 +396,7 @@ enum ArticleTemplate {
     .analysis { margin-top: 46px; padding: 22px 20px; border-radius: 20px; background: var(--accent-soft); }
     .analysis h2 { margin-top: 0; }
     .analysis-label { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .tts-current { background: var(--accent-soft); border-radius: 8px; box-shadow: 0 0 0 6px var(--accent-soft); transition: background .25s; }
     hr { border: none; border-top: 1px solid var(--faint); margin: 32px 0; }
     """
 }
